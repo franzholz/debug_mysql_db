@@ -1,0 +1,110 @@
+(add new changes on top of this file)
+
+16-06-30 Franz Holzinger <franz@ttproducts.de>
+	* works also under TYPO3 7.x and PHP 7.x
+	* fix bug: add a check for valid $uidIndexField in exec_SELECTgetRows
+
+15-10-21 Franz Holzinger <franz@ttproducts.de>
+	* fix bug with not debugged error case when no alias table name has been used
+	* TYPO3 6.2 uses the method query($query) instead of $this->link->query($query)
+	* fix bug with getLastInsertId
+
+15-07-21 Franz Holzinger <franz@ttproducts.de>
+	* fix bug with unknown PreparedStatement::class
+
+15-06-18 Franz Holzinger <franz@ttproducts.de>
+	* fix bug #67459: uncomment the bugfix
+
+15-06-16 Franz Holzinger <franz@ttproducts.de>
+	* fix bug #67459: TYPO3 6.2.x has a table sys_refindex which misses the field uid.
+
+13-12-19 Franz Holzinger <franz@ttproducts.de>
+	* require TYPO3 6.1.x or 6.2.x
+	* add prepare_SELECTquery
+
+13-06-04 Franz Holzinger <franz@ttproducts.de>
+	* use namespaces and require TYPO3 6.0.x
+	* remove query building functions because they do not generate a debug output
+	* use the MYSQL function LAST_INSERT_ID if sql_insert_id gives no result
+
+12-06-06 Franz Holzinger <franz@ttproducts.de>
+	* fix bug: SQL ERROR shall be shown even if a table is not in the $TCA and TCA is set.
+	* add admin_query
+	* add autoloader
+	* use t3lib_utility_Debug if available
+
+11-04-23 Franz Holzinger <franz@ttproducts.de>
+	* fix bug: SQL ERROR has not been shown when an alias has been used in long queries
+
+11-02-28 Franz Holzinger <franz@ttproducts.de>
+	* use the latest query in debug output if lastBuiltQuery is empty
+	* add conflict with the dbal extension
+	* fix bug: SQL ERROR has not been shown when an alias has been used
+
+10-10-08 Franz Holzinger <franz@ttproducts.de>
+	* fix bug in debugging not the tables from EXCLUDETABLES
+	* Version 0.3.6
+
+10-05-10 Franz Holzinger <franz@ttproducts.de>
+	* optimization to not execute operations when no debug output will be shown later
+	* Put into function/mode the code lines with filename, line number and function where the SQL has been called from
+	* Version 0.3.5
+
+10-05-01 Franz Holzinger <franz@ttproducts.de>
+	* do not call any code of debug_mysql_db if TYPO3_MODE is not FE or BE or ALL. This should speed it up.
+	* Version 0.3.4
+
+10-02-10 Stefan Geith <typo3dev2010@geithware.de>
+	* Upload to TER as 0.3.3
+
+10-02-08 Franz Holzinger <franz@ttproducts.de>
+	* do not debug disabled tables even in an error case
+
+09-11-21 Franz Holzinger <franz@ttproducts.de>
+	* add exclude table names which are normally system tables and the output is not wanted for the debugging of extensions
+	* add the TCA option to show only those tables from which the $TCA has been loaded
+	* fix bug where queries with table aliases and joins have not been shown if TABLES has been set to a table name
+	* Version 0.3.2
+
+09-10-19 Franz Holzinger <franz@ttproducts.de>
+	* support for debug output with error_log
+	* Version 0.3.1
+
+09-07-17 Stefan Geith <typo3dev2009@geithware.de>
+	* uploaded to TER as (accidentally) version 0.3.0
+
+09-07-16 Franz Holzinger <franz@ttproducts.de>
+	* add all new methods of t3lib_DB from TYPO3 4.3
+	* Version 0.2.5
+
+09-03-10 Stefan Geith <typo3devYYYY@geithware.de>
+	* added check for FeUser-ID(s), so debugs can be restricted to a test-FeUser
+	* Version 0.2.4
+
+09-02-10 Stefan Geith <typo3devYYYY@geithware.de>
+	* changed try/catch to if(function_exists)/else
+
+09-02-09 Franz Holzinger <franz@ttproducts.de>
+	* disable PHP warnings on wrong resource
+
+09-02-09 Stefan Geith <typo3devYYYY@geithware.de>
+	* added separator line in debug output to enhance readability
+
+09-01-15 Franz Holzinger <franz@ttproducts.de>
+	* allow Disable mysql errormessages [DISABLE_ERRORS]
+	* fix bug 8728: PHP Warning, if a sql error occurs - Bug in class t3lib_db function sql_fetch_assoc
+	* fix bug not to show a PHP Warning. SQL error output is enough for us.
+	* Version 0.2.1
+
+08-11-27 Franz Holzinger <contact@fholzinger.com>
+	* fill in debug_backtrace always when BTRACE_SQL has been set
+	* use microtime(true); instead of time() to get the time in microseconds
+	* enter and display time in miliseconds
+	* do the time measurements always
+
+08-11-10 Franz Holzinger <contact@fholzinger.com>
+	* new feature OUTPUT: make the OUTPUT configurable, in order to allow debugging with the cc_debug extension
+	* new feature TICKER: give the minimum time in seconds for reported SQL queries
+
+07-01-17 Stefan Geith  <typo3dev2007@geithware.de>
+	* Initial release
