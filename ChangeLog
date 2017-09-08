@@ -1,5 +1,9 @@
 (add new changes on top of this file)
 
+17-09-08 Franz Holzinger <franz@ttproducts.de>
+    * add a composer.json file
+    * support for TYPO3 8.7
+
 16-06-30 Franz Holzinger <franz@ttproducts.de>
 	* works also under TYPO3 7.x and PHP 7.x
 	* fix bug: add a check for valid $uidIndexField in exec_SELECTgetRows
