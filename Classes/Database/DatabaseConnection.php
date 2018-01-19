@@ -54,15 +54,15 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     protected $dbgId = array();
     protected $dbgFeUser = array();
     protected $dbgOutput = '';
-    protected $dbgTextformat = FALSE;
+    protected $dbgTextformat = false;
     protected $ticker = '';
 
     public function __construct () {
         $this->dbgConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db']);
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ? $this->dbgConf['OUTPUT'] : '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
-        $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ? $this->dbgConf['TEXTFORMAT'] : FALSE;
-        $this->dbgTca = $this->dbgConf['TCA'] ? $this->dbgConf['TCA'] : FALSE;
-        $this->debugOutput = (intval($this->dbgConf['DISABLE_ERRORS'])) ? FALSE : TRUE;
+        $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ? $this->dbgConf['TEXTFORMAT'] : false;
+        $this->dbgTca = $this->dbgConf['TCA'] ? $this->dbgConf['TCA'] : false;
+        $this->debugOutput = (intval($this->dbgConf['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $this->dbgConf['TICKER'] ? floatval($this->dbgConf['TICKER']) / 1000 : '';
 
         if (strtoupper($this->dbgConf['QUERIES']) == 'ALL' || !trim($this->dbgConf['QUERIES'])) {
@@ -154,14 +154,14 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param bool|array|string $no_quote_fields See fullQuoteArray()
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_INSERTquery ($table, $fields_values, $no_quote_fields = FALSE) {
+    public function exec_INSERTquery ($table, $fields_values, $no_quote_fields = false) {
         if (!$this->isConnected) {
             $this->connectDB();
         }
         $query = $this->INSERTquery($table, $fields_values, $no_quote_fields);
-        $starttime = microtime(TRUE);
+        $starttime = microtime(true);
         $res = $this->query($query);
-        $endtime = microtime(TRUE);
+        $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_INSERTquery';
@@ -187,14 +187,14 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param bool|array|string $no_quote_fields See fullQuoteArray()
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_INSERTmultipleRows ($table, array $fields, array $rows, $no_quote_fields = FALSE) {
+    public function exec_INSERTmultipleRows ($table, array $fields, array $rows, $no_quote_fields = false) {
         if (!$this->isConnected) {
             $this->connectDB();
         }
         $query = $this->INSERTmultipleRows($table, $fields, $rows, $no_quote_fields);
-        $starttime = microtime(TRUE);
+        $starttime = microtime(true);
         $res = $this->query($query);
-        $endtime = microtime(TRUE);
+        $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_INSERTmultipleRows';
@@ -222,14 +222,14 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param bool|array|string $no_quote_fields See fullQuoteArray()
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_UPDATEquery ($table, $where, $fields_values, $no_quote_fields = FALSE) {
+    public function exec_UPDATEquery ($table, $where, $fields_values, $no_quote_fields = false) {
         if (!$this->isConnected) {
             $this->connectDB();
         }
         $query = $this->UPDATEquery($table, $where, $fields_values, $no_quote_fields);
-        $starttime = microtime(TRUE);
+        $starttime = microtime(true);
         $res = $this->query($query);
-        $endtime = microtime(TRUE);
+        $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_UPDATEquery';
@@ -254,9 +254,9 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             $this->connectDB();
         }
         $query = $this->DELETEquery($table, $where);
-        $starttime = microtime(TRUE);
+        $starttime = microtime(true);
         $res = $this->query($query);
-        $endtime = microtime(TRUE);
+        $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_DELETEquery';
@@ -285,20 +285,20 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param boolean / array $dbgModes['name'] gives the debugging name
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $dbgModes = FALSE) {
+    public function exec_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $dbgModes = false) {
         if (!$this->isConnected) {
             $this->connectDB();
         }
 
         $query = $this->SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, 1);
-        $starttime = microtime(TRUE);
+        $starttime = microtime(true);
 
         $level = error_reporting();
         error_reporting($level & (E_ALL ^ E_WARNING));
         $res = $this->query($query);
         error_reporting($level);
 
-        $endtime = microtime(TRUE);
+        $endtime = microtime(true);
         $error = $this->sql_error();
 
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
@@ -333,7 +333,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @see exec_SELECTquery()
     */
     public function exec_SELECT_mm_query ($select, $local_table, $mm_table, $foreign_table, $whereClause = '', $groupBy = '', $orderBy = '', $limit = '') {
-        $foreign_table_as = $foreign_table == $local_table ? $foreign_table . str_replace('.', '', uniqid('_join', TRUE)) : '';
+        $foreign_table_as = $foreign_table == $local_table ? $foreign_table . str_replace('.', '', uniqid('_join', true)) : '';
         $mmWhere = $local_table ? $local_table . '.uid=' . $mm_table . '.uid_local' : '';
         $mmWhere .= ($local_table and $foreign_table) ? ' AND ' : '';
         $tables = ($local_table ? $local_table . ',' : '') . $mm_table;
@@ -365,7 +365,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param string $orderBy See exec_SELECTquery()
     * @param string $limit See exec_SELECTquery()
     * @param string $uidIndexField If set, the result array will carry this field names value as index. Requires that field to be selected of course!
-    * @return array|NULL Array of rows, or NULL in case of SQL error
+    * @return array|null Array of rows, or null in case of SQL error
     */
     public function exec_SELECTgetRows ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $uidIndexField = '') {
         $res = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, array('name' => 'exec_SELECTgetRows'));
@@ -406,15 +406,15 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param string $groupBy Optional GROUP BY field(s), if none, supply blank string.
     * @param string $orderBy Optional ORDER BY field(s), if none, supply blank string.
     * @param bool $numIndex If set, the result will be fetched with sql_fetch_row, otherwise sql_fetch_assoc will be used.
-    * @return array|FALSE|NULL Single row, FALSE on empty result, NULL on error
+    * @return array|false|null Single row, false on empty result, null on error
     */
-    public function exec_SELECTgetSingleRow ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $numIndex = FALSE) {
+    public function exec_SELECTgetSingleRow ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $numIndex = false) {
         $res = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, '1', array('name' => 'exec_SELECTgetSingleRow'));
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
         }
-        $output = NULL;
-        if ($res !== FALSE) {
+        $output = null;
+        if ($res !== false) {
             if ($numIndex) {
                 $output = $this->sql_fetch_row($res);
             } else {
@@ -431,12 +431,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param string $field Name of the field to use in the COUNT() expression (e.g. '*')
     * @param string $table Name of the table to count rows for
     * @param string $where (optional) WHERE statement of the query
-    * @return mixed Number of rows counter (int) or FALSE if something went wrong (bool)
+    * @return mixed Number of rows counter (int) or false if something went wrong (bool)
     */
     public function exec_SELECTcountRows ($field, $table, $where = '') {
-        $count = FALSE;
+        $count = false;
         $resultSet = $this->exec_SELECTquery('COUNT(' . $field . ')', $table, $where, '', '', '', array('name' => 'exec_SELECTcountRows'));
-        if ($resultSet !== FALSE) {
+        if ($resultSet !== false) {
             list($count) = $this->sql_fetch_row($resultSet);
             $count = (int)$count;
             $this->sql_free_result($resultSet);
@@ -493,10 +493,10 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         if (!$this->isConnected) {
             $this->connectDB();
         }
-        $starttime = microtime(TRUE);
+        $starttime = microtime(true);
         $res = $this->query($query);
-        $endtime = microtime(TRUE);
-        if (strpos($query, 'SESSION') === FALSE) {
+        $endtime = microtime(true);
+        if (strpos($query, 'SESSION') === false) {
             $error = $this->sql_error();
             if ($this->bDisplayOutput($error, $starttime, $endtime)) {
                 $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'TYPO3_DB->sql_query';
@@ -519,9 +519,9 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         if (!$this->isConnected) {
             $this->connectDB();
         }
-        $starttime = microtime(TRUE);
+        $starttime = microtime(true);
         $res = $this->query($query);
-        $endtime = microtime(TRUE);
+        $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = 'admin_query';
@@ -539,13 +539,13 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param	string		error text
     * @param	float		startime of mysql-command
     * @param	float		endime of mysql-command
-    * @return	boolean		TRUE if output should be displayed
+    * @return	boolean		true if output should be displayed
     */
     public function bDisplayOutput ($error, $starttime, $endtime) {
         if ($error != '' || $this->ticker == '' || $this->ticker <= $endtime - $starttime) {
-            $result = TRUE;
+            $result = true;
         } else {
-            $result = FALSE;
+            $result = false;
         }
         return $result;
     }
@@ -565,7 +565,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
                 if (
                     $this->dbgExcludeTable[$lowerTable]
                 ) {
-                    $bDisable = TRUE;
+                    $bDisable = true;
                 } else if (
                     (
                         isset($GLOBALS['TCA'][$lowerTable]) &&
@@ -573,12 +573,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
                     ) ||
                     $this->dbgTable[$lowerTable]
                 ) { // is this a table name inside of TYPO3?
-                    $bEnable = TRUE;
+                    $bEnable = true;
                 } else if (
                     !$bErrorCase &&
                     $this->dbgTca
                 ) { // an error message is also shown if the $GLOBALS['TCA'] is not loaded in the FE
-                    $bDisable = TRUE;
+                    $bDisable = true;
                 }
             }
         }
@@ -595,17 +595,17 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     */
     public function getEnableDisable ($sqlpart, $bErrorCase, &$bEnable, &$bDisable) {
 
-        $bEnable = FALSE;
-        $bDisable = FALSE;
+        $bEnable = false;
+        $bDisable = false;
         $x = strtok($sqlpart, ',=');
 
-        while ($x !== FALSE) {
+        while ($x !== false) {
             self::enableByTable($x, $bErrorCase, $bEnable, $bDisable);
             $x = strtok(',=');
         }
 
         if ($bEnable) {	// an explicitely set table overrides the excluded tables
-            $bDisable = FALSE;
+            $bDisable = false;
         }
     }
 
@@ -616,7 +616,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     */
     public function getTraceLine () {
 
-        $trail = debug_backtrace(FALSE);
+        $trail = debug_backtrace(false);
 
         $debugTrail1 = $trail[2];
         $debugTrail2 = $trail[3];
@@ -631,7 +631,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     }
 
     public function getLastInsertId ($table) {
-        $result = FALSE;
+        $result = false;
         $affectedRowsCount = $this->sql_affected_rows();
         if ($affectedRowsCount) {
             $result = $this->sql_insert_id();
@@ -642,14 +642,14 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             $affectedRowsCount &&
             get_class($this->getDatabaseHandle()) == 'mysqli' &&
             $table != '' &&
-            strpos($table, '_mm') === FALSE &&
-            strpos($table, 'cache') === FALSE &&
+            strpos($table, '_mm') === false &&
+            strpos($table, 'cache') === false &&
             isset($GLOBALS['TCA'][$table]) // Check if the uid field is present. Any TCA table must have it.
         ) {
             $sqlInsertId = 0;
             $lastInsertRes = $this->query( 'SELECT LAST_INSERT_ID() as insert_id' );
 
-            if ($lastInsertRes !== FALSE) {
+            if ($lastInsertRes !== false) {
                 while ($lastInsertRow = $lastInsertRes->fetch_assoc()) {
                     $sqlInsertId = $lastInsertRow['insert_id'];
                 }
@@ -706,7 +706,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             if (!intval($this->dbgConf['DISABLE_ERRORS'])) {
                 $this->getEnableDisable(
                     $sqlPart,
-                    TRUE,
+                    true,
                     $bEnable,
                     $bDisable
                 );
@@ -737,7 +737,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
                         $this->dbgOutput == 'error_log' ||
                         $this->dbgTextformat
                     ) {
-                        $debugOut = print_r($debugArray, TRUE);
+                        $debugOut = print_r($debugArray, true);
                     } else {
                         $debugOut = $debugArray;
                     }
@@ -755,7 +755,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         } else {
             $this->getEnableDisable(
                 $sqlPart,
-                FALSE,
+                false,
                 $bEnable,
                 $bDisable
             );
@@ -809,7 +809,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
                 $debugArray['------------'] = '';
 
                 if ($this->dbgTextformat) {
-                    $debugOut = print_r($debugArray, TRUE);
+                    $debugOut = print_r($debugArray, true);
                 } else {
                     $debugOut = $debugArray;
                 }
