@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2004-2017 Kasper Skaarhoj (kasperYYYY@typo3.com)
+*  (c) 2004-2018 Kasper Skaarhoj (kasperYYYY@typo3.com)
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -496,13 +496,15 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         $starttime = microtime(TRUE);
         $res = $this->query($query);
         $endtime = microtime(TRUE);
-        $error = $this->sql_error();
-        if ($this->bDisplayOutput($error, $starttime, $endtime)) {
-            $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'TYPO3_DB->sql_query';
-            $this->myDebug($myName, $error, 'SQL', '', $query, $res, $endtime - $starttime);
-        }
-        if ($this->debugOutput) {
-            $this->debug('sql_query', $query);
+        if (strpos($query, 'SESSION') === FALSE) {
+            $error = $this->sql_error();
+            if ($this->bDisplayOutput($error, $starttime, $endtime)) {
+                $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'TYPO3_DB->sql_query';
+                $this->myDebug($myName, $error, 'SQL', '', $query, $res, $endtime - $starttime);
+            }
+            if ($this->debugOutput) {
+                $this->debug('sql_query', $query);
+            }
         }
         return $res;
     }

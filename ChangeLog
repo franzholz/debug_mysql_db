@@ -1,4 +1,6 @@
 (add new changes on top of this file)
+18-01-19 Franz Holzinger <franz@ttproducts.de>
+    * do not debug direct SQL queries about the SESSION
 
 17-09-08 Franz Holzinger <franz@ttproducts.de>
     * add a composer.json file
