@@ -373,7 +373,6 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             $this->debug('exec_SELECTquery');
         }
         if ($this->sql_error()) {
-            $this->sql_free_result($res);
             return null;
         }
         $output = array();

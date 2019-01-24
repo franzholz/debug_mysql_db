@@ -1,4 +1,9 @@
 (add new changes on top of this file)
+
+
+19-01-24 Franz Holzinger <franz@ttproducts.de>
+    * bugfix error message: Invalid database result detected: function TYPO3\CMS\Core\Database\DatabaseConnection->sql_free_result 
+
 18-01-19 Franz Holzinger <franz@ttproducts.de>
     * do not debug direct SQL queries about the SESSION
     * change the constants TRUE, FALSE and NULL into lower case
