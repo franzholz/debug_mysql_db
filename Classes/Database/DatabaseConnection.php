@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2004-2018 Kasper Skaarhoj (kasperYYYY@typo3.com)
+*  (c) 2004-2019 Kasper Skaarhoj (kasperYYYY@typo3.com)
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -33,7 +33,7 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 /**
 * Contains a debug extension for mysql-db calls
 *
-* @author	Kasper Skaarhoj <kasperYYYY@typo3.com>
+* @author	TYPO3 Community
 * @author	Stefan Geith <typo3dev2013@geithware.de>
 */
 
@@ -41,12 +41,11 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 /**
 * extension of TYPO3 mysql database debug
 *
-* @author	Kasper Skaarhoj <kasper@typo3.com>
-* @author	Karsten Dambekalns <k.dambekalns@fishfarm.de>
+* @author	TYPO3 Community
 * @package TYPO3
-* @subpackage tx_dbal
+* @subpackage debug_mysql_db
 */
-class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
+class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection {
     protected $dbgConf = array();
     protected $dbgQuery = array();
     protected $dbgTable = array();
@@ -56,9 +55,19 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     protected $dbgOutput = '';
     protected $dbgTextformat = false;
     protected $ticker = '';
+    /**
+     * Internal property to mark if a deprecation log warning has been thrown in this request
+     * in order to avoid a load of deprecation.
+     * @var bool
+     */
+    protected $deprecationWarningThrown = true;
 
     public function __construct () {
-        $this->dbgConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db']);
+        $this->dbgConf =
+            \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here:
+
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ? $this->dbgConf['OUTPUT'] : '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
         $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ? $this->dbgConf['TEXTFORMAT'] : false;
         $this->dbgTca = $this->dbgConf['TCA'] ? $this->dbgConf['TCA'] : false;
@@ -160,12 +169,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         }
         $query = $this->INSERTquery($table, $fields_values, $no_quote_fields);
         $starttime = microtime(true);
-        $res = $this->query($query);
+        $resultSet = $this->query($query);
         $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_INSERTquery';
-            $this->myDebug($myName, $error, 'INSERT', $table, $query, $res, $endtime - $starttime);
+            $this->myDebug($myName, $error, 'INSERT', $table, $query, $resultSet, $endtime - $starttime);
         }
 
         if ($this->debugOutput) {
@@ -175,7 +184,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             /** @var $hookObject PostProcessQueryHookInterface */
             $hookObject->exec_INSERTquery_postProcessAction($table, $fields_values, $no_quote_fields, $this);
         }
-        return $res;
+        return $resultSet;
     }
 
     /**
@@ -193,12 +202,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         }
         $query = $this->INSERTmultipleRows($table, $fields, $rows, $no_quote_fields);
         $starttime = microtime(true);
-        $res = $this->query($query);
+        $resultSet = $this->query($query);
         $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_INSERTmultipleRows';
-            $this->myDebug($myName, $error, 'INSERT', $table, $query, $res, $endtime - $starttime);
+            $this->myDebug($myName, $error, 'INSERT', $table, $query, $resultSet, $endtime - $starttime);
         }
 
         if ($this->debugOutput) {
@@ -209,7 +218,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             /** @var $hookObject PostProcessQueryHookInterface */
             $hookObject->exec_INSERTmultipleRows_postProcessAction($table, $fields, $rows, $no_quote_fields, $this);
         }
-        return $res;
+        return $resultSet;
     }
 
     /**
@@ -228,18 +237,18 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         }
         $query = $this->UPDATEquery($table, $where, $fields_values, $no_quote_fields);
         $starttime = microtime(true);
-        $res = $this->query($query);
+        $resultSet = $this->query($query);
         $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_UPDATEquery';
-            $this->myDebug($myName, $error, 'UPDATE', $table, $query, $res, $endtime - $starttime);
+            $this->myDebug($myName, $error, 'UPDATE', $table, $query, $resultSet, $endtime - $starttime);
         }
         foreach ($this->postProcessHookObjects as $hookObject) {
             /** @var $hookObject PostProcessQueryHookInterface */
             $hookObject->exec_UPDATEquery_postProcessAction($table, $where, $fields_values, $no_quote_fields, $this);
         }
-        return $res;
+        return $resultSet;
     }
 
     /**
@@ -255,12 +264,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         }
         $query = $this->DELETEquery($table, $where);
         $starttime = microtime(true);
-        $res = $this->query($query);
+        $resultSet = $this->query($query);
         $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'exec_DELETEquery';
-            $this->myDebug($myName, $error, 'DELETE', $table, $query, $res, $endtime - $starttime);
+            $this->myDebug($myName, $error, 'DELETE', $table, $query, $resultSet, $endtime - $starttime);
         }
         if ($this->debugOutput) {
             $this->debug('exec_DELETEquery');
@@ -269,7 +278,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             /** @var $hookObject PostProcessQueryHookInterface */
             $hookObject->exec_DELETEquery_postProcessAction($table, $where, $this);
         }
-        return $res;
+        return $resultSet;
     }
 
     /**
@@ -295,7 +304,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
 
         $level = error_reporting();
         error_reporting($level & (E_ALL ^ E_WARNING));
-        $res = $this->query($query);
+        $resultSet = $this->query($query);
         error_reporting($level);
 
         $endtime = microtime(true);
@@ -303,7 +312,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
 
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__ . ':' . __LINE__ ) : 'exec_SELECTquery';
-            $this->myDebug($myName, $error, 'SELECT', $from_table, $query, $res, $endtime - $starttime);
+            $this->myDebug($myName, $error, 'SELECT', $from_table, $query, $resultSet, $endtime - $starttime);
         }
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
@@ -312,7 +321,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             /** @var $hookObject PostProcessQueryHookInterface */
             $hookObject->exec_SELECTquery_postProcessAction($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $this);
         }
-        return $res;
+        return $resultSet;
     }
 
     /**
@@ -368,7 +377,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @return array|null Array of rows, or null in case of SQL error
     */
     public function exec_SELECTgetRows ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $uidIndexField = '') {
-        $res = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, array('name' => 'exec_SELECTgetRows'));
+        $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, array('name' => 'exec_SELECTgetRows'));
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
         }
@@ -377,12 +386,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         }
         $output = array();
         $firstRecord = true;
-        while ($record = $this->sql_fetch_assoc($res)) {
+        while ($record = $this->sql_fetch_assoc($resultSet)) {
             if ($uidIndexField) {
                 if ($firstRecord) {
                     $firstRecord = false;
                     if (!array_key_exists($uidIndexField, $record)) {
-                        $this->sql_free_result($res);
+                        $this->sql_free_result($resultSet);
                         throw new \InvalidArgumentException('The given $uidIndexField "' . $uidIndexField . '" is not available in the result.', 1432933855);
                     }
                 }
@@ -391,7 +400,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
                 $output[] = $record;
             }
         }
-        $this->sql_free_result($res);
+        $this->sql_free_result($resultSet);
         return $output;
     }
 
@@ -408,18 +417,18 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @return array|false|null Single row, false on empty result, null on error
     */
     public function exec_SELECTgetSingleRow ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $numIndex = false) {
-        $res = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, '1', array('name' => 'exec_SELECTgetSingleRow'));
+        $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, '1', array('name' => 'exec_SELECTgetSingleRow'));
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
         }
         $output = null;
-        if ($res !== false) {
+        if ($resultSet !== false) {
             if ($numIndex) {
-                $output = $this->sql_fetch_row($res);
+                $output = $this->sql_fetch_row($resultSet);
             } else {
-                $output = $this->sql_fetch_assoc($res);
+                $output = $this->sql_fetch_assoc($resultSet);
             }
-            $this->sql_free_result($res);
+            $this->sql_free_result($resultSet);
         }
         return $output;
     }
@@ -437,7 +446,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         $resultSet = $this->exec_SELECTquery('COUNT(' . $field . ')', $table, $where, '', '', '', array('name' => 'exec_SELECTcountRows'));
         if ($resultSet !== false) {
             list($count) = $this->sql_fetch_row($resultSet);
-            $count = (int)$count;
+            $count = (int) $count;
             $this->sql_free_result($resultSet);
         }
         return $count;
@@ -493,19 +502,19 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             $this->connectDB();
         }
         $starttime = microtime(true);
-        $res = $this->query($query);
+        $resultSet = $this->query($query);
         $endtime = microtime(true);
         if (strpos($query, 'SESSION') === false) {
             $error = $this->sql_error();
             if ($this->bDisplayOutput($error, $starttime, $endtime)) {
                 $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__.':'.__LINE__ ) : 'TYPO3_DB->sql_query';
-                $this->myDebug($myName, $error, 'SQL', '', $query, $res, $endtime - $starttime);
+                $this->myDebug($myName, $error, 'SQL', '', $query, $resultSet, $endtime - $starttime);
             }
             if ($this->debugOutput) {
                 $this->debug('sql_query', $query);
             }
         }
-        return $res;
+        return $resultSet;
     }
 
     /**
@@ -519,17 +528,17 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
             $this->connectDB();
         }
         $starttime = microtime(true);
-        $res = $this->query($query);
+        $resultSet = $this->query($query);
         $endtime = microtime(true);
         $error = $this->sql_error();
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
             $myName = 'admin_query';
-            $this->myDebug($myName, $error, 'SQL', '', $query, $res, $endtime - $starttime);
+            $this->myDebug($myName, $error, 'SQL', '', $query, $resultSet, $endtime - $starttime);
         }
         if ($this->debugOutput) {
             $this->debug('admin_query', $query);
         }
-        return $res;
+        return $resultSet;
     }
 
     /**
@@ -621,12 +630,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
         $debugTrail2 = $trail[3];
         $debugTrail3 = $trail[4];
 
-        $rc =
+        $result =
             basename($debugTrail3['file']) . '#' . $debugTrail3['line'] . '->' . $debugTrail3['function'] . ' // ' .
             basename($debugTrail2['file']) . '#' . $debugTrail2['line'] . '->' . $debugTrail2['function'] . ' // ' .
             basename($debugTrail1['file']) . '#' . $debugTrail1['line'] . '->' . $debugTrail1['function'];
 
-        return $rc;
+        return $result;
     }
 
     public function getLastInsertId ($table) {
@@ -684,7 +693,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($func, $error, $mode, $table, $query, $res, $microseconds) {
+    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds) {
 
         $debugArray = Array('function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query);
         $feUid = 0;
@@ -779,7 +788,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
                 $debugArray['function/mode'] .= $this->getTraceLine();
 
                 if ($mode == 'SELECT') {
-                    $debugArray['num_rows()'] = $this->sql_num_rows($res);
+                    $debugArray['num_rows()'] = $this->sql_num_rows($resultSet);
                 }
 
                 if ($mode == 'UPDATE' || $mode == 'DELETE' || $mode == 'INSERT') {
@@ -792,8 +801,8 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection {
                 }
 
                 if ($mode == 'SQL') {
-                    if (is_resource($res)) {
-                        $debugArray['num_rows()'] = $this->sql_num_rows($res);
+                    if (is_resource($resultSet)) {
+                        $debugArray['num_rows()'] = $this->sql_num_rows($resultSet);
                     }
                     $debugArray['affected_rows()'] = $this->sql_affected_rows();
                     $insertId = $this->getLastInsertId($table);

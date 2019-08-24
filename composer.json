@@ -1,7 +1,7 @@
 {
   "name": "geithware/debug-mysql-db",
   "type": "typo3-cms-extension",
-  "description": "Extends \\TYPO3\\CMS\\Core\\Database\\DatabaseConnection (former t3lib_db) to show Errors and Debug-Messages. Useful for viewing and debugging of sql-queries.",
+  "description": "Extends \\TYPO3\\CMS\\Typo3DbLegacy\\Database (former \\TYPO3\\CMS\\Core\\Database\\DatabaseConnection and t3lib_db) to show Errors and Debug-Messages. Useful for viewing and debugging of sql-queries.",
   "keywords": [
     "TYPO3",
     "debug",
@@ -23,7 +23,8 @@
     "GPL-2.0+"
   ],
   "require": {
-    "typo3/cms-core": ">=6.1.0,<8.99.99"
+    "typo3/cms-core": ">=9.0.0,<9.99.99",
+    "friendsoftypo3/typo3db-legacy": ">=1.0.0,<1.2.0"
   },
   "autoload": {
     "psr-4": {
@@ -31,7 +32,7 @@
     }
   },
   "replace": {
-    "debug_mysql_db": "self.version",
+    "geithware/debug_mysql_db": "self.version",
     "typo3-ter/debug-mysql-db": "self.version"
   },
   "extra": {

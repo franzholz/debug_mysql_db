@@ -1,7 +1,8 @@
-(add new changes on top of this file)
 
+24-08-19 Franz Holzinger <franz@ttproducts.de>
+    * support for TYPO3 9.5 in combination with the extension typo3db_legacy.
 
-19-01-24 Franz Holzinger <franz@ttproducts.de>
+24-01-19 Franz Holzinger <franz@ttproducts.de>
     * bugfix error message: Invalid database result detected: function TYPO3\CMS\Core\Database\DatabaseConnection->sql_free_result 
 
 18-01-19 Franz Holzinger <franz@ttproducts.de>
