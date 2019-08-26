@@ -1,3 +1,5 @@
+26-08-19 Franz Holzinger <franz@ttproducts.de>
+    * adaptions according to the coding guidelines
 
 24-08-19 Franz Holzinger <franz@ttproducts.de>
     * support for TYPO3 9.5 in combination with the extension typo3db_legacy.

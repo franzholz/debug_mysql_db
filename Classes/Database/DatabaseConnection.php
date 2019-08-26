@@ -62,7 +62,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
      */
     protected $deprecationWarningThrown = true;
 
-    public function __construct () {
+    public function __construct ()
+    {
         $this->dbgConf =
             \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
                 \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
@@ -134,7 +135,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param string $query The query to send to the database
     * @return bool|\mysqli_result
     */
-    protected function query($query) {
+    protected function query($query)
+    {
         if (!$this->isConnected) {
             $this->connectDB();
         }
@@ -196,7 +198,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param bool|array|string $no_quote_fields See fullQuoteArray()
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_INSERTmultipleRows ($table, array $fields, array $rows, $no_quote_fields = false) {
+    public function exec_INSERTmultipleRows ($table, array $fields, array $rows, $no_quote_fields = false)
+    {
         if (!$this->isConnected) {
             $this->connectDB();
         }
@@ -231,7 +234,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param bool|array|string $no_quote_fields See fullQuoteArray()
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_UPDATEquery ($table, $where, $fields_values, $no_quote_fields = false) {
+    public function exec_UPDATEquery ($table, $where, $fields_values, $no_quote_fields = false)
+    {
         if (!$this->isConnected) {
             $this->connectDB();
         }
@@ -258,7 +262,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param string $where WHERE clause, eg. "uid=1". NOTICE: You must escape values in this argument with $this->fullQuoteStr() yourself!
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_DELETEquery ($table, $where) {
+    public function exec_DELETEquery ($table, $where)
+    {
         if (!$this->isConnected) {
             $this->connectDB();
         }
@@ -294,7 +299,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param boolean / array $dbgModes['name'] gives the debugging name
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function exec_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $dbgModes = false) {
+    public function exec_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $dbgModes = false)
+    {
         if (!$this->isConnected) {
             $this->connectDB();
         }
@@ -341,7 +347,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     * @see exec_SELECTquery()
     */
-    public function exec_SELECT_mm_query ($select, $local_table, $mm_table, $foreign_table, $whereClause = '', $groupBy = '', $orderBy = '', $limit = '') {
+    public function exec_SELECT_mm_query ($select, $local_table, $mm_table, $foreign_table, $whereClause = '', $groupBy = '', $orderBy = '', $limit = '')
+    {
         $foreign_table_as = $foreign_table == $local_table ? $foreign_table . str_replace('.', '', uniqid('_join', true)) : '';
         $mmWhere = $local_table ? $local_table . '.uid=' . $mm_table . '.uid_local' : '';
         $mmWhere .= ($local_table and $foreign_table) ? ' AND ' : '';
@@ -360,7 +367,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     * @see exec_SELECTquery()
     */
-    public function exec_SELECT_queryArray ($queryParts) {
+    public function exec_SELECT_queryArray ($queryParts)
+    {
         return $this->exec_SELECTquery($queryParts['SELECT'], $queryParts['FROM'], $queryParts['WHERE'], $queryParts['GROUPBY'], $queryParts['ORDERBY'], $queryParts['LIMIT'], array('name' => 'exec_SELECT_queryArray'));
     }
 
@@ -376,7 +384,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param string $uidIndexField If set, the result array will carry this field names value as index. Requires that field to be selected of course!
     * @return array|null Array of rows, or null in case of SQL error
     */
-    public function exec_SELECTgetRows ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $uidIndexField = '') {
+    public function exec_SELECTgetRows ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $uidIndexField = '')
+    {
         $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, array('name' => 'exec_SELECTgetRows'));
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
@@ -416,7 +425,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param bool $numIndex If set, the result will be fetched with sql_fetch_row, otherwise sql_fetch_assoc will be used.
     * @return array|false|null Single row, false on empty result, null on error
     */
-    public function exec_SELECTgetSingleRow ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $numIndex = false) {
+    public function exec_SELECTgetSingleRow ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $numIndex = false)
+    {
         $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, '1', array('name' => 'exec_SELECTgetSingleRow'));
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
@@ -441,7 +451,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param string $where (optional) WHERE statement of the query
     * @return mixed Number of rows counter (int) or false if something went wrong (bool)
     */
-    public function exec_SELECTcountRows ($field, $table, $where = '') {
+    public function exec_SELECTcountRows ($field, $table, $where = '')
+    {
         $count = false;
         $resultSet = $this->exec_SELECTquery('COUNT(' . $field . ')', $table, $where, '', '', '', array('name' => 'exec_SELECTcountRows'));
         if ($resultSet !== false) {
@@ -470,7 +481,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param array $input_parameters An array of values with as many elements as there are bound parameters in the SQL statement being executed. All values are treated as \TYPO3\CMS\Core\Database\PreparedStatement::PARAM_AUTOTYPE.
     * @return \TYPO3\CMS\Core\Database\PreparedStatement Prepared statement
     */
-    public function prepare_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', array $input_parameters = array()) {
+    public function prepare_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', array $input_parameters = array())
+    {
         $query = $this->SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, array('name' => 'prepare_SELECTquery'));
         /** @var $preparedStatement \TYPO3\CMS\Core\Database\PreparedStatement */
         $preparedStatement = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\PreparedStatement', $query, $from_table, array());
@@ -497,7 +509,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param string $query Query to execute
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function sql_query ($query) {
+    public function sql_query ($query)
+    {
         if (!$this->isConnected) {
             $this->connectDB();
         }
@@ -523,7 +536,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param string $query Query to execute
     * @return bool|\mysqli_result|object MySQLi result object / DBAL object
     */
-    public function admin_query ($query) {
+    public function admin_query ($query)
+    {
         if (!$this->isConnected) {
             $this->connectDB();
         }
@@ -549,7 +563,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param	float		endime of mysql-command
     * @return	boolean		true if output should be displayed
     */
-    public function bDisplayOutput ($error, $starttime, $endtime) {
+    public function bDisplayOutput ($error, $starttime, $endtime)
+    {
         if ($error != '' || $this->ticker == '' || $this->ticker <= $endtime - $starttime) {
             $result = true;
         } else {
@@ -558,7 +573,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
         return $result;
     }
 
-    public function enableByTable ($tablePart, $bErrorCase, &$bEnable, &$bDisable) {
+    public function enableByTable ($tablePart, $bErrorCase, &$bEnable, &$bDisable)
+    {
         if ($tablePart != '') {
             $partArray = explode('.', $tablePart);
             $lowerTable = strtolower($partArray['0']);
@@ -601,8 +617,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param	boolean		output: table is disabled
     * @return	void
     */
-    public function getEnableDisable ($sqlpart, $bErrorCase, &$bEnable, &$bDisable) {
-
+    public function getEnableDisable ($sqlpart, $bErrorCase, &$bEnable, &$bDisable)
+    {
         $bEnable = false;
         $bDisable = false;
         $x = strtok($sqlpart, ',=');
@@ -622,8 +638,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     *
     * @return	string	file name and line numbers ob the backtrace
     */
-    public function getTraceLine () {
-
+    public function getTraceLine ()
+    {
         $trail = debug_backtrace(false);
 
         $debugTrail1 = $trail[2];
@@ -638,7 +654,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
         return $result;
     }
 
-    public function getLastInsertId ($table) {
+    public function getLastInsertId ($table)
+    {
         $result = false;
         $affectedRowsCount = $this->sql_affected_rows();
         if ($affectedRowsCount) {
@@ -693,9 +710,9 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds) {
-
-        $debugArray = Array('function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query);
+    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds)
+    {
+        $debugArray = array('function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query);
         $feUid = 0;
 
         if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
@@ -827,7 +844,8 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
         }
     }
 
-    public function callDebugger ($debugFunc, $debugOut) {
+    public function callDebugger ($debugFunc, $debugOut)
+    {
         try {
             if (
                 $debugFunc == 'debug' &&
