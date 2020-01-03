@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2004-2019 Kasper Skaarhoj (kasperYYYY@typo3.com)
+*  (c) 2004-2020 Kasper Skaarhoj (kasperYYYY@typo3.com)
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -45,7 +45,7 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 * @package TYPO3
 * @subpackage debug_mysql_db
 */
-class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection {
+class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection implements \TYPO3\CMS\Core\SingletonInterface {
     protected $dbgConf = array();
     protected $dbgQuery = array();
     protected $dbgTable = array();
@@ -62,13 +62,15 @@ class DatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConne
      */
     protected $deprecationWarningThrown = true;
 
-    public function __construct ()
+    /**
+     * Initialize the database connection
+     */
+    public function initialize ()
     {
         $this->dbgConf =
             \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
                 \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
-            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here:
-
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ? $this->dbgConf['OUTPUT'] : '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
         $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ? $this->dbgConf['TEXTFORMAT'] : false;
         $this->dbgTca = $this->dbgConf['TCA'] ? $this->dbgConf['TCA'] : false;
