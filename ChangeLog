@@ -1,10 +1,12 @@
+2020-01-24  Franz Holzinger  <franz@ttproducts.de>
 
+    * new feature: support for Doctrine
 
 2020-01-03  Franz Holzinger  <franz@ttproducts.de>
 
     * bugfix: the initialization must be done in the method initialize and not in the constructor __construct.
 
-    
+################################################################    
 
 26-08-19 Franz Holzinger <franz@ttproducts.de>
     * adaptions according to the coding guidelines
