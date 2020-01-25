@@ -19,6 +19,7 @@ use Psr\Log\LoggerAwareTrait;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Mysqli\Driver;
 
 
@@ -86,14 +87,60 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      */
     public function executeQuery ($query, array $params = [], $types = [], ?\Doctrine\DBAL\Cache\QueryCacheProfile $qcp = null)
     {
-        debug($query, 'executeQuery $query');
-        debug($params, 'executeQuery $params');
+        $expandedQuery = $query;
+        foreach ($params as $paramName => $value) {
+            $type = $types[$paramName];
+            switch ($type) {
+                case Connection::PARAM_INT_ARRAY:
+                    if (is_array($value)) {
+                        $value = implode(',', $value);
+                    } else {
+                        continue 2;
+                    }
+                    break;
+                case Connection::PARAM_STR_ARRAY:
+                    if (is_array($value)) {
+                        $newValueArray = [];
+                        foreach ($value as $subValue) {
+                            $newValueArray[] = '\'' . $value . '\'';
+                        }
+                        $value = implode(',', $newValueArray);
+                    } else {
+                        continue 2;
+                    }
+                    break;
+                case \TYPO3\CMS\Core\Database\Connection::PARAM_INT:
+                    $value = intval($value);
+                    break;
+                case \TYPO3\CMS\Core\Database\Connection::PARAM_STR:
+                    $value = '\'' . $value . '\'';
+                    break;
+            }
+            $expandedQuery = str_replace(':' . $paramName, $value, $expandedQuery);
+        }
 
+        $starttime = microtime(true);
         $stmt = parent::executeQuery($query, $params, $types, $qcp);
+        $endtime = microtime(true);
+        $errorCode = $this->errorCode();
 
-        debug($stmt, 'executeQuery $stmt');
+        if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
+            $errorInfo = null;
+            if ($errorCode) {
+                $errorInfo = $errorCode . ':' . $this->errorInfo();
+            }
+            $myName = 'exec';
+            $table = 'Test- Tabelle';
+            $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, $endtime - $starttime);
+        }
+    
+        if ($this->debugOutput) {
+            $this->debug('exec');
+        }
+
         return $stmt;
     }
+
 
 
     /**
@@ -107,7 +154,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      */
     public function exec ($statement)
     {
-    debug ($statement, 'exec $statement');
         $starttime = microtime(true);
         try {
             $result = parent::exec($statement);
@@ -117,16 +163,18 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $endtime = microtime(true);
         $errorCode = $this->errorCode();
 
-        if ($this->bDisplayOutput($error, $starttime, $endtime)) {
+        if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
+            $errorInfo = $errorCode . ':' . $this->errorInfo();
             $myName = 'exec';
             $table = 'Test- Tabelle';
             $query = 'Test- Query';
-            $this->myDebug($myName, $error, 'INSERT', $table, $query, $result, $endtime - $starttime);
+            $this->myDebug($myName, $errorInfo, 'SQL', $table, $query, $result, $endtime - $starttime);
         }
     
         if ($this->debugOutput) {
             $this->debug('exec');
         }
+
 
         return $result;
     }

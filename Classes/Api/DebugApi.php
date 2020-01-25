@@ -18,6 +18,9 @@ namespace Geithware\DebugMysqlDb\Api;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 
+use Geithware\DebugMysqlDb\Database\DatabaseConnection;
+use Geithware\DebugMysqlDb\Database\DoctrineConnection;
+
 
 /**
 * extension of TYPO3 mysql database debug
@@ -111,7 +114,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     * @param	string		mode
     * @param	string		table name
     * @param	string		SQL query
-    * @param	resource	SQL resource
+    * @param	resource	SQL resource or statement
     * @param	string		consumed time in microseconds
     * @return	void
     */
@@ -210,7 +213,13 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 $debugArray['function/mode'] .= $this->getTraceLine();
 
                 if ($mode == 'SELECT') {
-                    $debugArray['num_rows()'] = $pObj->sql_num_rows($resultSet);
+                    $affectedRows = null;
+                    if (is_a($pObj, DoctrineConnection::class)) {
+                        $affectedRows = $resultSet->rowCount();
+                    } else if (is_a($pObj, DatabaseConnection::class)) {
+                        $affectedRows = $pObj->sql_num_rows($resultSet);
+                    }
+                    $debugArray['num_rows()'] = $affectedRows;
                 }
 
                 if ($mode == 'UPDATE' || $mode == 'DELETE' || $mode == 'INSERT') {
@@ -218,7 +227,12 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 }
 
                 if ($mode == 'INSERT') {
-                    $insertId = $pObj->getLastInsertId($table);
+                    $insertId = false;
+                    if (is_a($pObj, DoctrineConnection::class)) {
+                        $insertId = $pObj->lastInsertId($table);
+                    } else if (is_a($pObj, DatabaseConnection::class)) {
+                        $insertId = $pObj->getLastInsertId($table);
+                    }
                     $debugArray['insert_id()'] = $insertId;
                 }
 

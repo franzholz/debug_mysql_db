@@ -1,3 +1,6 @@
+2020-01-25  Franz Holzinger  <franz@ttproducts.de>
+    * new feature: debug output for Doctrine method executeQuery
+
 2020-01-24  Franz Holzinger  <franz@ttproducts.de>
 
     * new feature: support for Doctrine
