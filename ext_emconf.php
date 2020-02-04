@@ -2,9 +2,9 @@
 
 $EM_CONF[$_EXTKEY] = array(
     'title' => 'Debug Mysql DB',
-    'description' => 'Extends \\TYPO3\\CMS\\Core\\Database\\DatabaseConnection (former t3lib_db) to show Errors and Debug-Messages. Useful for viewing and debugging of sql-queries. Shows error messages if they occur. (For TYPO3 before 9 use the versions 0.6.x)',
+    'description' => 'Extends \\TYPO3\\CMS\\Core\\Database\\DatabaseConnection (former t3lib_db) and \\TYPO3\\CMS\\Core\\Database\\Connection to show Errors and Debug-Messages. Useful for viewing and debugging of sql-queries. Shows error messages if they occur.',
     'category' => 'misc',
-    'version' => '0.8.0',
+    'version' => '0.8.1',
     'state' => 'stable',
     'uploadfolder' => 0,
     'createDirs' => '',
