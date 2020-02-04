@@ -84,5 +84,7 @@ call_user_func(function () {
     );
     
     $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][\TYPO3\CMS\Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME]['wrapperClass'] = \Geithware\DebugMysqlDb\Database\DoctrineConnection::class;
+
 });
+
 

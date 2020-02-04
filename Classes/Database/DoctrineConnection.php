@@ -87,38 +87,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      */
     public function executeQuery ($query, array $params = [], $types = [], ?\Doctrine\DBAL\Cache\QueryCacheProfile $qcp = null)
     {
-        $expandedQuery = $query;
-        foreach ($params as $paramName => $value) {
-            $type = $types[$paramName];
-            switch ($type) {
-                case Connection::PARAM_INT_ARRAY:
-                    if (is_array($value)) {
-                        $value = implode(',', $value);
-                    } else {
-                        continue 2;
-                    }
-                    break;
-                case Connection::PARAM_STR_ARRAY:
-                    if (is_array($value)) {
-                        $newValueArray = [];
-                        foreach ($value as $subValue) {
-                            $newValueArray[] = '\'' . $value . '\'';
-                        }
-                        $value = implode(',', $newValueArray);
-                    } else {
-                        continue 2;
-                    }
-                    break;
-                case \TYPO3\CMS\Core\Database\Connection::PARAM_INT:
-                    $value = intval($value);
-                    break;
-                case \TYPO3\CMS\Core\Database\Connection::PARAM_STR:
-                    $value = '\'' . $value . '\'';
-                    break;
-            }
-            $expandedQuery = str_replace(':' . $paramName, $value, $expandedQuery);
-        }
-
         $starttime = microtime(true);
         $stmt = parent::executeQuery($query, $params, $types, $qcp);
         $endtime = microtime(true);
@@ -129,13 +97,49 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             if ($errorCode) {
                 $errorInfo = $errorCode . ':' . $this->errorInfo();
             }
-            $myName = 'exec';
-            $table = 'Test- Tabelle';
+            $expandedQuery = $query;
+            foreach ($params as $paramName => $value) {
+                $type = $types[$paramName];
+                switch ($type) {
+                    case Connection::PARAM_INT_ARRAY:
+                        if (is_array($value)) {
+                            $value = implode(',', $value);
+                        } else {
+                            continue 2;
+                        }
+                        break;
+                    case Connection::PARAM_STR_ARRAY:
+                        if (is_array($value)) {
+                            $newValueArray = [];
+                            foreach ($value as $subValue) {
+                                $newValueArray[] = '\'' . $value . '\'';
+                            }
+                            $value = implode(',', $newValueArray);
+                        } else {
+                            continue 2;
+                        }
+                        break;
+                    case \TYPO3\CMS\Core\Database\Connection::PARAM_INT:
+                        $value = intval($value);
+                        break;
+                    case \TYPO3\CMS\Core\Database\Connection::PARAM_STR:
+                        $value = '\'' . $value . '\'';
+                        break;
+                }
+                $expandedQuery = str_replace(':' . $paramName, $value, $expandedQuery);
+            }
+
+            $myName = 'executeQuery';
+            $table = 'executeQuery: table not found';
+            preg_match('/FROM `(\w+)`/s' , $query, $matches);
+            if (is_array($matches) && isset($matches['1'])) {
+                $table = $matches['1'];
+            }
             $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, $endtime - $starttime);
         }
     
         if ($this->debugOutput) {
-            $this->debug('exec');
+            $this->debug('executeQuery');
         }
 
         return $stmt;
@@ -166,15 +170,15 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
             $errorInfo = $errorCode . ':' . $this->errorInfo();
             $myName = 'exec';
-            $table = 'Test- Tabelle';
-            $query = 'Test- Query';
+            // TODO:
+            $table = 'exec Test- Tabelle';
+            $query = 'exec Test- Query';
             $this->myDebug($myName, $errorInfo, 'SQL', $table, $query, $result, $endtime - $starttime);
         }
     
         if ($this->debugOutput) {
             $this->debug('exec');
         }
-
 
         return $result;
     }
