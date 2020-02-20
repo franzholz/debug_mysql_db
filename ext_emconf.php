@@ -1,7 +1,7 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = array(
-    'title' => 'Debug Mysql DB',
+    'title' => 'Debug Mysql or other DB',
     'description' => 'Extends \\TYPO3\\CMS\\Core\\Database\\DatabaseConnection (former t3lib_db) and \\TYPO3\\CMS\\Core\\Database\\Connection to show Errors and Debug-Messages. Useful for viewing and debugging of sql-queries. Shows error messages if they occur.',
     'category' => 'misc',
     'version' => '0.8.1',

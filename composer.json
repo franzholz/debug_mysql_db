@@ -31,7 +31,7 @@
     }
   },
   "replace": {
-    "geithware/debug_mysql_db": "self.version",
+    "geithware/debug-mysql-db": "self.version",
     "typo3-ter/debug-mysql-db": "self.version"
   },
   "extra": {

@@ -1,3 +1,6 @@
+2020-02-20  Franz Holzinger  <franz@ttproducts.de>
+    * bugfix for TYPO3 8.7: The old style TYPO3_DB based functions did not get debugged.
+
 2020-01-25  Franz Holzinger  <franz@ttproducts.de>
     * new feature: debug output for Doctrine method executeQuery
 

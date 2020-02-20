@@ -15,8 +15,8 @@ namespace Geithware\DebugMysqlDb\Database;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 
 
 /**
@@ -28,9 +28,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 * @package TYPO3
 * @subpackage debug_mysql_db
 */
-class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection implements \TYPO3\CMS\Core\SingletonInterface {
-
-
+class Typo3DbLegacyDatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection implements \TYPO3\CMS\Core\SingletonInterface {
     protected $debugApi = null;
     public $debugOutput = false;
     protected $ticker = '';
@@ -576,6 +574,4 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
     {
         $this->debugApi->myDebug($this, $func, $error, $mode, $table, $query, $resultSet, $microseconds);
     }
-
 }
-

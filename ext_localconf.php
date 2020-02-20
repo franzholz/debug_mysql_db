@@ -2,13 +2,26 @@
 defined('TYPO3_MODE') || die('Access denied.');
 
 call_user_func(function () {
+    $extensionConfiguration = array();
+
+    if (
+        defined('TYPO3_version') &&
+        version_compare(TYPO3_version, '9.0.0', '>=')
+    ) {
+        $extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+            \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+        )->get('debug_mysql_db');
+    } else { // before TYPO3 9
+        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db']);
+    }
+
     if (class_exists('TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection')) {
         if (is_object($GLOBALS['TYPO3_DB'])) {
             $GLOBALS['TYPO3_DB']->__sleep();
         }
 
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection'] = array(
-            'className' => \Geithware\DebugMysqlDb\Database\DatabaseConnection::class
+            'className' => \Geithware\DebugMysqlDb\Database\Typo3DbLegacyDatabaseConnection::class
         );
 
         //**********************************************
@@ -16,10 +29,10 @@ call_user_func(function () {
         //**********************************************
 
         require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('debug_mysql_db') . 'Classes/Api/DebugApi.php');
-        require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('debug_mysql_db') . 'Classes/Database/DatabaseConnection.php');
+        require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('debug_mysql_db') . 'Classes/Database/Typo3DbLegacyDatabaseConnection.php');
 
         // Initialize database connection in $GLOBALS and connect
-        $databaseConnection = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Database\DatabaseConnection::class);
+        $databaseConnection = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Database\Typo3DbLegacyDatabaseConnection::class);
     
         $databaseConnection->setDatabaseName(
             $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['dbname'] ?? ''
@@ -77,6 +90,18 @@ call_user_func(function () {
 
         $GLOBALS['TYPO3_DB'] = $databaseConnection;
         $GLOBALS['TYPO3_DB']->initialize();
+    } else if (
+        defined('TYPO3_version') &&
+        version_compare(TYPO3_version, '9.0.0', '<')
+    ) {
+        $dbgMode = $extensionConfiguration['TYPO3_MODE'] ? trim(strtoupper($extensionConfiguration['TYPO3_MODE'])) : 'OFF';
+
+        if (TYPO3_MODE == $dbgMode || $dbgMode == 'ALL') {
+
+            $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\DatabaseConnection'] = array(
+                'className' => \Geithware\DebugMysqlDb\Database\DatabaseConnection::class
+            );
+        }
     }
 
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\Connection'] = array(
@@ -84,7 +109,6 @@ call_user_func(function () {
     );
     
     $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][\TYPO3\CMS\Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME]['wrapperClass'] = \Geithware\DebugMysqlDb\Database\DoctrineConnection::class;
-
 });
 
 
