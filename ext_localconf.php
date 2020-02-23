@@ -21,7 +21,7 @@ call_user_func(function () {
         }
 
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection'] = array(
-            'className' => \Geithware\DebugMysqlDb\Database\Typo3DbLegacyDatabaseConnection::class
+            'className' => \Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection::class
         );
 
         //**********************************************
@@ -29,10 +29,10 @@ call_user_func(function () {
         //**********************************************
 
         require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('debug_mysql_db') . 'Classes/Api/DebugApi.php');
-        require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('debug_mysql_db') . 'Classes/Database/Typo3DbLegacyDatabaseConnection.php');
+        require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('debug_mysql_db') . 'Classes/Database/Typo3DbLegacyConnection.php');
 
         // Initialize database connection in $GLOBALS and connect
-        $databaseConnection = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Database\Typo3DbLegacyDatabaseConnection::class);
+        $databaseConnection = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection::class);
     
         $databaseConnection->setDatabaseName(
             $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['dbname'] ?? ''

@@ -28,7 +28,7 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 * @package TYPO3
 * @subpackage debug_mysql_db
 */
-class Typo3DbLegacyDatabaseConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection implements \TYPO3\CMS\Core\SingletonInterface {
+class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection implements \TYPO3\CMS\Core\SingletonInterface {
     protected $debugApi = null;
     public $debugOutput = false;
     protected $ticker = '';
