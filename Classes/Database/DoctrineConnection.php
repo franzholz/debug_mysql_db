@@ -22,14 +22,16 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Mysqli\Driver;
 
-
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+
 
 
 class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements \Psr\Log\LoggerAwareInterface {
     use LoggerAwareTrait;
 
     protected $debugApi = null;
+    protected $doctrineApi = null;
     protected $debugOutput = false;
     protected $ticker = '';
 
@@ -68,6 +70,23 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 
         $this->debugApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DebugApi::class, $extensionConfiguration);
+        $this->doctrineApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DoctrineApi::class);
+    }
+
+    /**
+    * dependency injection of a sql logger
+    *
+    * @return bool
+    */
+    public function connect(): bool
+    {
+        // Early return if the connection is already open and custom setup has been done.
+        if (!parent::connect()) {
+            return false;
+        }
+        $logger = GeneralUtility::makeInstance(Logging\SqlQueryLogger::class);
+        $configuration = $this->getConfiguration()->setSQLLogger($logger);
+        return true;
     }
 
     /**
@@ -94,44 +113,20 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
         if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
             $errorInfo = null;
+            
             if ($errorCode) {
                 $errorInfo = $errorCode . ':' . $this->errorInfo();
             }
-            $expandedQuery = $query;
-            foreach ($params as $paramName => $value) {
-                $type = $types[$paramName];
-                switch ($type) {
-                    case Connection::PARAM_INT_ARRAY:
-                        if (is_array($value)) {
-                            $value = implode(',', $value);
-                        } else {
-                            continue 2;
-                        }
-                        break;
-                    case Connection::PARAM_STR_ARRAY:
-                        if (is_array($value)) {
-                            $newValueArray = [];
-                            foreach ($value as $subValue) {
-                                $newValueArray[] = '\'' . $value . '\'';
-                            }
-                            $value = implode(',', $newValueArray);
-                        } else {
-                            continue 2;
-                        }
-                        break;
-                    case \TYPO3\CMS\Core\Database\Connection::PARAM_INT:
-                        $value = intval($value);
-                        break;
-                    case \TYPO3\CMS\Core\Database\Connection::PARAM_STR:
-                        $value = '\'' . $value . '\'';
-                        break;
-                }
-                $expandedQuery = str_replace(':' . $paramName, $value, $expandedQuery);
-            }
 
+            $expandedQuery = 
+                $this->doctrineApi->getExpandedQuery(
+                    $query,
+                    $params
+                );
             $myName = 'executeQuery';
             $table = 'executeQuery: table not found';
-            preg_match('/FROM `(\w+)`/s' , $query, $matches);
+
+            preg_match('/FROM `(\w+)`/s' , $expandedQuery, $matches);
             if (is_array($matches) && isset($matches['1'])) {
                 $table = $matches['1'];
             }

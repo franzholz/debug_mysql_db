@@ -1,3 +1,6 @@
+2020-07-11  Franz Holzinger  <franz@ttproducts.de>
+    * new feature for TYPO3 9.5: Add a SQL Query Logger and its FileWriter class which also supports the debug method.
+
 2020-02-23  Franz Holzinger  <franz@ttproducts.de>
     * bugfix for TYPO3 9.5: Wrong class name Typo3DbLegacyDatabaseConnection. Use Typo3DbLegacyConnection instead.
 

@@ -109,6 +109,15 @@ call_user_func(function () {
     );
     
     $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][\TYPO3\CMS\Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME]['wrapperClass'] = \Geithware\DebugMysqlDb\Database\DoctrineConnection::class;
-});
 
+    if ($extensionConfiguration['FILEWRITER']) {
+        $GLOBALS['TYPO3_CONF_VARS']['LOG']['Geithware']['DebugMysqlDb'] = [
+            'writerConfiguration' => [
+                \TYPO3\CMS\Core\Log\LogLevel::DEBUG => [
+                    \Geithware\DebugMysqlDb\Log\Writer\FileWriter::class => []
+                ]
+            ],
+        ];
+    }
+});
 
