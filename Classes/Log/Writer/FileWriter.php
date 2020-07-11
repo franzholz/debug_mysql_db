@@ -23,7 +23,6 @@ use TYPO3\CMS\Core\Log\LogRecord;
  */
 class FileWriter extends \TYPO3\CMS\Core\Log\Writer\FileWriter
 {
-
     /**
      * Default log file path
      *
@@ -31,6 +30,16 @@ class FileWriter extends \TYPO3\CMS\Core\Log\Writer\FileWriter
      */
     protected $defaultLogFileTemplate = '/log/database_%s.log';
 
+    /** @var int */
+    protected $mode;
+
+    public function setMode ($param) {
+        $this->mode = $param;
+    }
+
+    public function getMode () {
+        return $this->mode;
+    }
 
     /**
      * Writes the log record
@@ -39,10 +48,18 @@ class FileWriter extends \TYPO3\CMS\Core\Log\Writer\FileWriter
      * @return WriterInterface $this
      * @throws \RuntimeException
      */
-    public function writeLog(LogRecord $record)
+    public function writeLog (LogRecord $record)
     {
-        parent::writeLog($record);
-        debug($record, '$record'); // keep this
+        $mode = $this->getMode();
+        if ($mode == 1 || $mode == 3) {
+            debug($record['data'], 'SQL LOG'); // keep this
+        }
+
+        unset($record['data']['trace']);
+
+        if ($mode == 2 || $mode == 3) {
+            parent::writeLog($record);
+        }
     }
 }
 

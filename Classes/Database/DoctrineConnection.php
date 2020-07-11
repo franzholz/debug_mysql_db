@@ -34,6 +34,9 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     protected $doctrineApi = null;
     protected $debugOutput = false;
     protected $ticker = '';
+    protected $fileWriterMode = 0;
+    /** @var bool */
+    protected $backTrace = false;
 
     /**
      * Internal property to mark if a deprecation log warning has been thrown in this request
@@ -68,6 +71,8 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         }
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
+        $this->fileWriterMode = $extensionConfiguration['FILEWRITER'] ? intval($extensionConfiguration['FILEWRITER']) : 0;
+        $this->backTrace = (bool) $extensionConfiguration['BTRACE_SQL'];
 
         $this->debugApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DebugApi::class, $extensionConfiguration);
         $this->doctrineApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DoctrineApi::class);
@@ -84,7 +89,12 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if (!parent::connect()) {
             return false;
         }
-        $logger = GeneralUtility::makeInstance(Logging\SqlQueryLogger::class);
+        $logger = 
+            GeneralUtility::makeInstance(
+                Logging\SqlQueryLogger::class,
+                $this->fileWriterMode,
+                $this->backTrace
+            );
         $configuration = $this->getConfiguration()->setSQLLogger($logger);
         return true;
     }
@@ -126,7 +136,12 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             $myName = 'executeQuery';
             $table = 'executeQuery: table not found';
 
-            preg_match('/FROM `(\w+)`/s' , $expandedQuery, $matches);
+            if (strpos($expandedQuery, '`')) {
+                preg_match('/FROM `(\w+)`/s' , $expandedQuery, $matches);
+            } else {
+                preg_match('/FROM (\w+) /s' , $expandedQuery, $matches);
+            }
+
             if (is_array($matches) && isset($matches['1'])) {
                 $table = $matches['1'];
             }

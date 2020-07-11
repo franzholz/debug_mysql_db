@@ -114,7 +114,9 @@ call_user_func(function () {
         $GLOBALS['TYPO3_CONF_VARS']['LOG']['Geithware']['DebugMysqlDb'] = [
             'writerConfiguration' => [
                 \TYPO3\CMS\Core\Log\LogLevel::DEBUG => [
-                    \Geithware\DebugMysqlDb\Log\Writer\FileWriter::class => []
+                    \Geithware\DebugMysqlDb\Log\Writer\FileWriter::class => [
+                        'mode' => $extensionConfiguration['FILEWRITER']
+                    ]
                 ]
             ],
         ];

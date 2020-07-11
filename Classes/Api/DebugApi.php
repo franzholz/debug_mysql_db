@@ -122,6 +122,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     {
         $debugArray = array('function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query);
         $feUid = 0;
+        $id = GeneralUtility::_GP('id');
 
         if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
             if (is_array($GLOBALS['TSFE']->fe_user->user)) {
@@ -206,7 +207,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                     $this->dbgFeUser[$feUid . '.']
                 ) &&
                 (
-                    $this->dbgId[$GLOBALS['TSFE']->id . '.'] ||
+                    $this->dbgId[$id . '.'] ||
                     $this->dbgId['0.']
                 )
             ) {

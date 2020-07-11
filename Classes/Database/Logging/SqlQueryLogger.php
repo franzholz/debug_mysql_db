@@ -46,11 +46,18 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface
     /** @var array */
     public $currentQuery = [];
 
-    private $doctrineApi;
-    
-    
-    public function __construct() {
+    protected $doctrineApi;
+
+    /** @var int */
+    protected $fileWriterMode;
+
+    /** @var bool */
+    protected $backTrace;
+
+    public function __construct($fileWriterMode, $backTrace) {
         $this->doctrineApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DoctrineApi::class);
+        $this->fileWriterMode = $fileWriterMode;
+        $this->backTrace = $backTrace;
     }
 
     /**
@@ -65,6 +72,9 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface
         $this->start = microtime(true);
         $this->queryCount += 1;
         $this->currentQuery = ['sql' => $sql, 'params' => $params, 'types' => $types, 'executionMS' => 0];
+        if ($this->backTrace) {
+            $this->currentQuery['debug_backtrace'] = \TYPO3\CMS\Core\Utility\DebugUtility::debugTrail();
+        }
     }
 
     /**
@@ -83,8 +93,11 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface
             $this->currentQuery['sql'],
             $this->currentQuery['params']
         );
+
+        if (isset($this->currentQuery['debug_backtrace'])) {
+            $logData['trace'] = $this->currentQuery['debug_backtrace'];
+        }
         $this->logger->debug("SQL Debug", $logData);
     }
 }
-
 
