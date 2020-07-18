@@ -89,10 +89,11 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
         if (! $this->enabled) {
             return;
         }
-        $typo3Exception = strpos(implode('', $this->currentQuery['params']), 'TYPO3 Exception') > 0;
+        $paramString = implode('', $this->currentQuery['params']);
+        $dbalException = (strpos($paramString, 'DBALException') > 0 || strpos($paramString, 'DriverException') > 0);
 
         $queries = [];
-        if ($typo3Exception) {
+        if ($dbalException) {
         // no logging has yet been done for a query interrupted by an exception
             $this->lastQuery['error'] = 'SQL error';
             $queries[] = $this->lastQuery;
@@ -101,7 +102,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
 
         foreach($queries as $query) {
             $logData = [];
-            if (!$typo3Exception) {
+            if (!$dbalException) {
                 $logData['miliseconds'] = round((microtime(true) - $this->start) * 1000, 3);
             }
 
