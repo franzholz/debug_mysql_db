@@ -52,7 +52,7 @@ class FileWriter extends \TYPO3\CMS\Core\Log\Writer\FileWriter
     {
         $mode = $this->getMode();
         if ($mode == 1 || $mode == 3) {
-            debug($record['data'], 'SQL LOG'); // keep this
+            debug($record['data'], 'SQL LOGGER'); // keep this
         }
 
         unset($record['data']['trace']);

@@ -33,6 +33,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     protected $debugApi = null;
     protected $doctrineApi = null;
     protected $debugOutput = false;
+    protected $debugUtilityErrors = false;
     protected $ticker = '';
     protected $fileWriterMode = 0;
     /** @var bool */
@@ -70,6 +71,8 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
         }
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
+        $this->debugUtilityErrors = (intval($extensionConfiguration['DEBUGUTILITY_ERRORS'])) ? true : false;
+
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
         $this->fileWriterMode = $extensionConfiguration['FILEWRITER'] ? intval($extensionConfiguration['FILEWRITER']) : 0;
         $this->backTrace = (bool) $extensionConfiguration['BTRACE_SQL'];
@@ -131,7 +134,8 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             $expandedQuery = 
                 $this->doctrineApi->getExpandedQuery(
                     $query,
-                    $params
+                    $params,
+                    $types
                 );
             $myName = 'executeQuery';
             $table = 'executeQuery: table not found';
@@ -172,7 +176,9 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         try {
             $result = parent::exec($statement);
         } catch (Throwable $ex) {
-            debug($ex);
+            if ($this->debugOutput) {
+                debug($ex);
+            }
         }
         $endtime = microtime(true);
         $errorCode = $this->errorCode();
@@ -230,21 +236,30 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     {
         $errorCode = $this->errorCode();
  
-        if ($errorCode || (int)$this->debugOutput === 2) {
+        if ($errorCode) {
             $errorInfo = $this->errorInfo();
-
-            \TYPO3\CMS\Core\Utility\DebugUtility::debug(
+            $errorDebug = 
                 [
                     'caller' => \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection::class . '::' . $func,
                     'ERROR' => $errorCode . ':' . $errorInfo,
                     'lastBuiltQuery' => $query ? $query : $this->debug_lastBuiltQuery,
                     'debug_backtrace' => \TYPO3\CMS\Core\Utility\DebugUtility::debugTrail()
-                ],
-                $func,
-                is_object($GLOBALS['error']) && @is_callable([$GLOBALS['error'], 'debug'])
-                    ? ''
-                    : 'DB Error'
-            );
+                ];
+
+            if ($this->debugUtilityErrors) {
+                \TYPO3\CMS\Core\Utility\DebugUtility::debug(
+                    $errorDebug,
+                    $func,
+                    is_object($GLOBALS['error']) && @is_callable([$GLOBALS['error'], 'debug'])
+                        ? ''
+                        : 'DB Error'
+                );
+            } else if (
+                is_object($GLOBALS['error']) &&
+                @is_callable([$GLOBALS['error'], 'debug'])
+            ) {
+                debug($errorDebug, '');
+            }
         }
     }
 

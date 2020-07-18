@@ -22,10 +22,28 @@ use Doctrine\DBAL\Connection;
 class DoctrineApi implements \TYPO3\CMS\Core\SingletonInterface {
 
     // mit QueryBuilder Methode ergänzen
-    public function getExpandedQuery ($query, $params) {
+    public function getExpandedQuery ($query, $params, $types) {
+        $questionmarkMode = strpos($query, '(?');
+        $parts = [];
+        $partsIndex = 0;
+        if ($questionmarkMode) {
+            $parts = explode('?', $query);
+        }
         $expandedQuery = $query;
         foreach ($params as $paramName => $value) {
-            $type = $types[$paramName];
+            if (
+                is_array($types) &&
+                isset($types[$paramName])
+            ) {
+                $type = $types[$paramName];
+            } else if (is_int($value)) {
+                $type = \TYPO3\CMS\Core\Database\Connection::PARAM_INT;
+            } else if (is_string($value)) {
+                $type = \TYPO3\CMS\Core\Database\Connection::PARAM_STR;
+            } else {
+                $type = \TYPO3\CMS\Core\Database\Connection::PARAM_STR_ARRAY;
+            }
+    
             switch ($type) {
                 case Connection::PARAM_INT_ARRAY:
                     if (is_array($value)) {
@@ -52,8 +70,18 @@ class DoctrineApi implements \TYPO3\CMS\Core\SingletonInterface {
                     $value = '\'' . $value . '\'';
                     break;
             }
-            $expandedQuery = str_replace(':' . $paramName, $value, $expandedQuery);
+
+            if ($questionmarkMode) {
+                $parts[$partsIndex++] .= $value;
+            } else {
+                $expandedQuery = str_replace(':' . $paramName, $value, $expandedQuery);
+            }
         }
+
+        if ($questionmarkMode) {
+            $expandedQuery = implode('', $parts);
+        }
+
         return $expandedQuery;
     }
 }

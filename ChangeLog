@@ -1,3 +1,8 @@
+2020-07-18  Franz Holzinger  <franz@ttproducts.de>
+    * new feature: The FileWriter Logger must store the previous SQL query. Because if an exception happens, then the SQL query by the exception will be written and the formerly interrupted SQL query would be lost.
+    * new feature: expand the SQL queries also with question marks as placeholders
+    * new feature: debugUtilityErrors only for the debugUtility class of TYPO3. Turning this off should help to avoid an output by TYPO3 which causes Ajax errors.
+
 2020-07-11  Franz Holzinger  <franz@ttproducts.de>
     * new feature for TYPO3 9.5: Add a SQL Query Logger and its FileWriter class which also supports the debug method.
 

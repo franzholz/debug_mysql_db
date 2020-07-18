@@ -1,7 +1,9 @@
   # cat=basic/conf; type=text; label= TYPO3 Mode: FE, BE, ALL or OFF. Normaly set to FE to enable all FE-Plugins SQL-Queries! Debugging only enabled in this Mode. Use BE only with caution.
 TYPO3_MODE = FE
-  # cat=basic/conf; type=boolean; label= Disable mysql errormessages: Normally all mysql_errors() that occur will be displayed. Set to 1 to disable.
+  # cat=basic/conf; type=boolean; label= Disable SQL errormessages: Normally all SQL errors that occur will be displayed. Set to 1 to disable.
 DISABLE_ERRORS = 0
+  # cat=basic/conf; type=boolean; label= Use debug utility for errors: If set and an error occurs, all error messages are sent to \TYPO3\CMS\Core\Utility\DebugUtility::debug as well as to the debug method if available.
+DEBUGUTILITY_ERRORS = 0
   # cat=basic/conf; type=text; label= Comma-sep. list of queries: 'ALL' for all types of queries. 'None' for none. ALL, SQL (only sql() and sql_query() ), SELECT, UPDATE, INSERT, DELETE
 QUERIES = ALL
   # cat=basic/conf; type=text; label= Comma-sep. list of tables: 'ALL' for all tables. 'None' for none. List of tables that generate debug-messages.

@@ -26,7 +26,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * This implements a Doctrine SQL Query Logger for TYPO3
  */
-class SqlQueryLogger implements SQLLogger, LoggerAwareInterface
+class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core\SingletonInterface
 {
    use LoggerAwareTrait;
 
@@ -42,6 +42,9 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface
 
     /** @var int */
     public $queryCount = 0;
+
+    /** @var array */
+    public $lastQuery = [];
 
     /** @var array */
     public $currentQuery = [];
@@ -69,6 +72,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface
             return;
         }
 
+        $this->lastQuery = $this->currentQuery;
         $this->start = microtime(true);
         $this->queryCount += 1;
         $this->currentQuery = ['sql' => $sql, 'params' => $params, 'types' => $types, 'executionMS' => 0];
@@ -85,19 +89,37 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface
         if (! $this->enabled) {
             return;
         }
+        $typo3Exception = strpos(implode('', $this->currentQuery['params']), 'TYPO3 Exception') > 0;
 
-        $logData = [];
-        $logData['miliseconds'] = round((microtime(true) - $this->start) * 1000, 3);
-
-        $logData['sql'] = $this->doctrineApi->getExpandedQuery(
-            $this->currentQuery['sql'],
-            $this->currentQuery['params']
-        );
-
-        if (isset($this->currentQuery['debug_backtrace'])) {
-            $logData['trace'] = $this->currentQuery['debug_backtrace'];
+        $queries = [];
+        if ($typo3Exception) {
+        // no logging has yet been done for a query interrupted by an exception
+            $this->lastQuery['error'] = 'SQL error';
+            $queries[] = $this->lastQuery;
         }
-        $this->logger->debug("SQL Debug", $logData);
+        $queries[] = $this->currentQuery;
+
+        foreach($queries as $query) {
+            $logData = [];
+            if (!$typo3Exception) {
+                $logData['miliseconds'] = round((microtime(true) - $this->start) * 1000, 3);
+            }
+
+            $logData['sql'] = $this->doctrineApi->getExpandedQuery(
+                $query['sql'],
+                $query['params'],
+                $query['types']
+            );
+
+            if (isset($query['error'])) {
+                $logData['error'] = $query['error'];
+            }
+
+            if (isset($this->currentQuery['debug_backtrace'])) {
+                $logData['trace'] = $query['debug_backtrace'];
+            }
+            $this->logger->debug('SQL Debug', $logData);
+        }
     }
 }
 
