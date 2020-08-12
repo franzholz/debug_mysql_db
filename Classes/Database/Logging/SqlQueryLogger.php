@@ -18,8 +18,10 @@ use Doctrine\DBAL\Logging\SQLLogger;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 
@@ -89,6 +91,12 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
         if (! $this->enabled) {
             return;
         }
+
+        // Maybe no logger is instantiated in TYPO3 8.7 
+        if (!($this->logger instanceof LoggerInterface)) {
+            $this->setLogger(GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__));    
+        }
+
         $paramString = implode('', $this->currentQuery['params']);
         $dbalException = (strpos($paramString, 'DBALException') > 0 || strpos($paramString, 'DriverException') > 0);
 

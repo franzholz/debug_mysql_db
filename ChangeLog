@@ -1,3 +1,6 @@
+2020-08-12 Franz Holzinger <franz@ttproducts.de>
+    * bugfix for TYPO3 8.7. There can exist a case when the logger has not been set.
+
 2020-07-18  Franz Holzinger  <franz@ttproducts.de>
     * new feature: The FileWriter Logger must store the previous SQL query. Because if an exception happens, then the SQL query by the exception will be written and the formerly interrupted SQL query would be lost.
     * new feature: expand the SQL queries also with question marks as placeholders
