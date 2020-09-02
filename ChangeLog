@@ -1,3 +1,9 @@
+
+
+
+2020-09-02 Franz Holzinger <franz@ttproducts.de>
+    * bugfix: the SQL query logger params must be checked for the type array.
+
 2020-08-12 Franz Holzinger <franz@ttproducts.de>
     * bugfix for TYPO3 8.7. There can exist a case when the logger has not been set.
 

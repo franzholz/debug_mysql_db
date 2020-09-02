@@ -97,7 +97,10 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
             $this->setLogger(GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__));    
         }
 
-        $paramString = implode('', $this->currentQuery['params']);
+        $paramString = null;
+        if (is_array($this->currentQuery['params'])) {
+            $paramString = implode('', $this->currentQuery['params']);
+        }
         $dbalException = (strpos($paramString, 'DBALException') > 0 || strpos($paramString, 'DriverException') > 0);
 
         $queries = [];
