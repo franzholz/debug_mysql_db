@@ -92,6 +92,8 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
             return;
         }
 
+        $debugApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DebugApi::class, $extensionConfiguration);
+
         // Maybe no logger is instantiated in TYPO3 8.7 
         if (!($this->logger instanceof LoggerInterface)) {
             $this->setLogger(GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__));    
@@ -111,7 +113,19 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
         }
         $queries[] = $this->currentQuery;
 
+        
+        
+
         foreach($queries as $query) {
+        
+            $enable = true;
+            $disable = false;
+            $debugApi->getEnableDisable($query['sql'], false, $enable, $disable);
+
+            if (!$enable || $disable) {
+                continue;
+            }
+
             $logData = [];
             if (!$dbalException) {
                 $logData['miliseconds'] = round((microtime(true) - $this->start) * 1000, 3);

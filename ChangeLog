@@ -1,5 +1,9 @@
 
 
+2020-11-10 Franz Holzinger <franz@ttproducts.de>
+    * bugfix: The SQL query logger params must be shown correctly also for UPDATE and INSERT
+    * bugfix: The detection of tables out of a SQL query will give better results
+    * new feature: Use the install tool configurations with table limits also for the SQL query logger.
 
 2020-09-02 Franz Holzinger <franz@ttproducts.de>
     * bugfix: the SQL query logger params must be checked for the type array.

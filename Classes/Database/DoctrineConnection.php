@@ -108,7 +108,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * If the query is parametrized, a prepared statement is used.
      * If an SQLLogger is configured, the execution is logged.
      *
-     * @param string                 $query  The SQL query to execute.
+     * @param string                 $query  The SQL query to execute with placeholders for the following parameters.
      * @param mixed[]                $params The parameters to bind to the query, if any.
      * @param int[]|string[]         $types  The types the previous parameters are in.
      * @param QueryCacheProfile|null $qcp    The query cache profile, optional.
@@ -149,7 +149,15 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             if (is_array($matches) && isset($matches['1'])) {
                 $table = $matches['1'];
             }
-            $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, $endtime - $starttime);
+
+            $typeArray = ['SELECT', 'DELETE', 'UPDATE', 'INSERT'];
+            foreach ($typeArray as $type) {
+                if (substr($query, 0, strlen($type)) == $type) {
+                    break;
+                }
+            }
+
+            $this->myDebug($myName, $errorInfo, $type, $table, $expandedQuery, $stmt, $endtime - $starttime);
         }
     
         if ($this->debugOutput) {
@@ -158,8 +166,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
         return $stmt;
     }
-
-
 
     /**
      * Executes an SQL statement and return the number of affected rows.

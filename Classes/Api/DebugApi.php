@@ -20,6 +20,8 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 
 use Geithware\DebugMysqlDb\Database\DatabaseConnection;
 use Geithware\DebugMysqlDb\Database\DoctrineConnection;
+use Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection;
+
 
 
 /**
@@ -32,14 +34,18 @@ use Geithware\DebugMysqlDb\Database\DoctrineConnection;
 * @subpackage debug_mysql_db
 */
 class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
-    protected $dbgConf = array();
-    protected $dbgQuery = array();
-    protected $dbgTable = array();
-    protected $dbgExcludeTable = array();
-    protected $dbgId = array();
-    protected $dbgFeUser = array();
+    protected $dbgConf = [];
+    protected $dbgQuery = [];
+    protected $dbgTable = [];
+    protected $dbgExcludeTable = [];
+    protected $dbgId = [];
+    protected $dbgFeUser = [];
     protected $dbgOutput = '';
     protected $dbgTextformat = false;
+    protected $typo3Tables = [
+        'cache_treelist',
+        'fe_sessions'
+    ];
 
     public function __construct ($debugConf)
     {
@@ -52,7 +58,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
             strtoupper($this->dbgConf['QUERIES']) == 'ALL' ||
             !trim($this->dbgConf['QUERIES'])
         ) {
-            $this->dbgQuery = Array(
+            $this->dbgQuery = [
                 'ALL' => 1,
                 'SQL' => 1,
                 'SELECT' => 1,
@@ -61,7 +67,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 'DELETE'=>1,
                 'FETCH' => 1,
                 'FIRSTROW' => 1
-            );
+            ];
         } else {
             $tmp =
                 GeneralUtility::trimExplode(
@@ -77,7 +83,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
             strtoupper($this->dbgConf['TABLES']) == 'ALL' ||
             !trim($this->dbgConf['TABLES'])
         ) {
-            $this->dbgTable = Array('all' => 1);
+            $this->dbgTable = ['all' => 1];
 
             if ($this->dbgConf['EXCLUDETABLES'] != '') {
                 $tmp = GeneralUtility::trimExplode(',', $this->dbgConf['EXCLUDETABLES']);
@@ -120,7 +126,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     */
     public function myDebug ($pObj, $func, $error, $mode, $table, $query, $resultSet, $microseconds)
     {
-        $debugArray = array('function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query);
+        $debugArray = ['function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
         $feUid = 0;
         $id = GeneralUtility::_GP('id');
 
@@ -217,8 +223,13 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                     $affectedRows = null;
                     if (is_a($pObj, DoctrineConnection::class)) {
                         $affectedRows = $resultSet->rowCount();
-                    } else if (is_a($pObj, DatabaseConnection::class)) {
+                    } else if (
+                        is_a($pObj, DatabaseConnection::class) ||
+                        is_a($pObj, Typo3DbLegacyConnection::class)
+                    ) {
                         $affectedRows = $pObj->sql_num_rows($resultSet);
+                    } else {
+                        debug ($tmp, 'debug_mysql_db: unknown class "' . get_class($pObj) . '"');  // keep this
                     }
                     $debugArray['num_rows()'] = $affectedRows;
                 }
@@ -270,7 +281,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
             if (
                 $debugFunc == 'debug' &&
                 is_object($GLOBALS['error']) &&
-                @is_callable(array($GLOBALS['error'], 'debug'))
+                @is_callable([$GLOBALS['error'], 'debug'])
             ) {
                 $GLOBALS['error']->debug($debugOut, 'SQL debug');
             } else if (function_exists($debugFunc) && is_callable($debugFunc)) {
@@ -295,22 +306,26 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     */
     public function getEnableDisable ($sqlpart, $bErrorCase, &$bEnable, &$bDisable)
     {
+        $sqlpart = preg_replace('/[`"\'?*()]*(:dcValue[0-9]*)*/', '', $sqlpart);
         $bEnable = false;
         $bDisable = false;
-        $x = strtok($sqlpart, ',=');
+        $strtokString = ',=<> ';
+        $x = strtok($sqlpart, $strtokString);
 
         while ($x !== false) {
-            self::enableByTable($x, $bErrorCase, $bEnable, $bDisable);
-            $x = strtok(',=');
+            $this->enableByTable($x, $bErrorCase, $bEnable, $bDisable);
+            $x = strtok($strtokString);
         }
 
-        if ($bEnable) {	// an explicitely set table overrides the excluded tables
+        if ($bEnable) {	// an explicitly set table overrides the excluded tables
             $bDisable = false;
         }
     }
 
     public function enableByTable ($tablePart, $bErrorCase, &$bEnable, &$bDisable)
     {
+        $tablePart = trim ($tablePart);
+
         if ($tablePart != '') {
             $partArray = explode('.', $tablePart);
             $lowerTable = strtolower($partArray['0']);
@@ -319,9 +334,11 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
             if ($lowerTable == '') {
                 $lowerTable = $aliasArray['1'];
             }
-            $keyWords = array('select', 'transaction', 'commit', 'update', 'delete');
+            $lowerTable = trim($lowerTable);
+            $keyWords = ['select', 'transaction', 'commit', 'update', 'delete', 'from', 'where', 'order', 'by', 'sorting', 'desc'];
 
             if (!in_array($lowerTable, $keyWords)) {
+    
                 if (
                     $this->dbgExcludeTable[$lowerTable]
                 ) {
@@ -329,7 +346,14 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 } else if (
                     (
                         isset($GLOBALS['TCA'][$lowerTable]) &&
-                        $this->dbgTca
+                        (
+                            $this->dbgTca ||
+                            $this->dbgTable['all'] 
+                        )
+                    ) ||
+                    (
+                        $this->dbgTable['all']  &&
+                        in_array($lowerTable, $this->typo3Tables)
                     ) ||
                     $this->dbgTable[$lowerTable]
                 ) { // is this a table name inside of TYPO3?

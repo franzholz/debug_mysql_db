@@ -18,13 +18,14 @@ namespace Geithware\DebugMysqlDb\Api;
 use Doctrine\DBAL\Connection;
 
 
-
 class DoctrineApi implements \TYPO3\CMS\Core\SingletonInterface {
 
     // mit QueryBuilder Methode ergänzen
     public function getExpandedQuery ($query, $params, $types) {
-        $questionmarkMode = strpos($query, '(?');
-        $parts = [];
+        $questionmarkMode = 
+            strpos($query, '(?') || 
+            strpos($query, '= ?');
+        $parts = []; 
         $partsIndex = 0;
         if ($questionmarkMode) {
             $parts = explode('?', $query);
@@ -43,7 +44,7 @@ class DoctrineApi implements \TYPO3\CMS\Core\SingletonInterface {
             } else {
                 $type = \TYPO3\CMS\Core\Database\Connection::PARAM_STR_ARRAY;
             }
-    
+
             switch ($type) {
                 case Connection::PARAM_INT_ARRAY:
                     if (is_array($value)) {
