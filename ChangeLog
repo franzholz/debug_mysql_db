@@ -1,4 +1,6 @@
 
+2020-11-13 Franz Holzinger <franz@ttproducts.de>
+    * DoctrineConnection must use $resultSet->rowCount for UPDATE, DELETE and INSERT SQL queries to get the affected rows.
 
 2020-11-10 Franz Holzinger <franz@ttproducts.de>
     * bugfix: The SQL query logger params must be shown correctly also for UPDATE and INSERT

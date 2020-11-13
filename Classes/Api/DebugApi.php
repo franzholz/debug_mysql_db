@@ -235,7 +235,17 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 }
 
                 if ($mode == 'UPDATE' || $mode == 'DELETE' || $mode == 'INSERT') {
-                    $debugArray['affected_rows()'] = $pObj->sql_affected_rows();
+                    if (is_a($pObj, DoctrineConnection::class)) {
+                        $affectedRows = $resultSet->rowCount();
+                    } else if (
+                        is_a($pObj, DatabaseConnection::class) ||
+                        is_a($pObj, Typo3DbLegacyConnection::class)
+                    ) {
+                        $affectedRows = $pObj->sql_affected_rows();
+                    } else {
+                        debug ($tmp, 'debug_mysql_db: unknown class "' . get_class($pObj) . '"');  // keep this
+                    }
+                    $debugArray['affected_rows()'] = $affectedRows;
                 }
 
                 if ($mode == 'INSERT') {
