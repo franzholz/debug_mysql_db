@@ -1,5 +1,6 @@
 
 2020-11-13 Franz Holzinger <franz@ttproducts.de>
+    * restructure the DebugApi call. No database objects should be parameters.
     * DoctrineConnection must use $resultSet->rowCount for UPDATE, DELETE and INSERT SQL queries to get the affected rows.
 
 2020-11-10 Franz Holzinger <franz@ttproducts.de>

@@ -120,11 +120,12 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     * @param	string		mode
     * @param	string		table name
     * @param	string		SQL query
-    * @param	resource	SQL resource or statement
+    * @param	integer	    count of affected rows
+    * @param	integer	    insertion id
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($pObj, $func, $error, $mode, $table, $query, $resultSet, $microseconds)
+    public function myDebug ($pObj, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds)
     {
         $debugArray = ['function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
         $feUid = 0;
@@ -220,51 +221,13 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 $debugArray['function/mode'] .= $this->getTraceLine();
 
                 if ($mode == 'SELECT') {
-                    $affectedRows = null;
-                    if (is_a($pObj, DoctrineConnection::class)) {
-                        $affectedRows = $resultSet->rowCount();
-                    } else if (
-                        is_a($pObj, DatabaseConnection::class) ||
-                        is_a($pObj, Typo3DbLegacyConnection::class)
-                    ) {
-                        $affectedRows = $pObj->sql_num_rows($resultSet);
-                    } else {
-                        debug ($tmp, 'debug_mysql_db: unknown class "' . get_class($pObj) . '"');  // keep this
-                    }
                     $debugArray['num_rows()'] = $affectedRows;
-                }
-
-                if ($mode == 'UPDATE' || $mode == 'DELETE' || $mode == 'INSERT') {
-                    if (is_a($pObj, DoctrineConnection::class)) {
-                        $affectedRows = $resultSet->rowCount();
-                    } else if (
-                        is_a($pObj, DatabaseConnection::class) ||
-                        is_a($pObj, Typo3DbLegacyConnection::class)
-                    ) {
-                        $affectedRows = $pObj->sql_affected_rows();
-                    } else {
-                        debug ($tmp, 'debug_mysql_db: unknown class "' . get_class($pObj) . '"');  // keep this
-                    }
+                } else {
                     $debugArray['affected_rows()'] = $affectedRows;
                 }
 
-                if ($mode == 'INSERT') {
-                    $insertId = false;
-                    if (is_a($pObj, DoctrineConnection::class)) {
-                        $insertId = $pObj->lastInsertId($table);
-                    } else if (is_a($pObj, DatabaseConnection::class)) {
-                        $insertId = $pObj->getLastInsertId($table);
-                    }
+                if ($insertId) {
                     $debugArray['insert_id()'] = $insertId;
-                }
-
-                if ($mode == 'SQL') {
-                    if (is_resource($resultSet)) {
-                        $debugArray['num_rows()'] = $pObj->sql_num_rows($resultSet);
-                    }
-                    $debugArray['affected_rows()'] = $pObj->sql_affected_rows();
-                    $insertId = $pObj->getLastInsertId($table);
-                    $debugArray['insert_id()'] =  $insertId;
                 }
 
                 if ($this->dbgConf['BTRACE_SQL']) {

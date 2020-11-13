@@ -572,6 +572,18 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     */
     public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds)
     {
-        $this->debugApi->myDebug($this, $func, $error, $mode, $table, $query, $resultSet, $microseconds);
+        $affectedRows = '';
+        $insertId = 0;
+        if ($mode == 'SELECT') {
+            $affectedRows = $this->sql_num_rows($resultSet);
+        } else if (in_array($mode, ['UPDATE', 'DELETE', 'INSERT', 'SQL'])) {
+            $affectedRows = $this->sql_affected_rows();
+        }
+
+        if ($mode == 'INSERT' || $mode == 'SQL') {
+            $insertId = $this->getLastInsertId($table);
+        }
+
+        $this->debugApi->myDebug($this, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds);
     }
 }

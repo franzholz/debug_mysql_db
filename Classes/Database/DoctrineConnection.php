@@ -20,9 +20,16 @@ use Psr\Log\LoggerAwareTrait;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Mysqli\Driver;
+use Doctrine\DBAL\SQLParserUtils;
+use Exception;
+
+
+
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
 
 
 
@@ -102,6 +109,22 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         return true;
     }
 
+    public function determineTablename ($expandedQuery) 
+    {
+        $result = 'executeQuery: table not found';
+
+        if (strpos($expandedQuery, '`')) {
+            preg_match('/FROM `(\w+)`/s' , $expandedQuery, $matches);
+        } else {
+            preg_match('/FROM (\w+) /s' , $expandedQuery, $matches);
+        }
+
+        if (is_array($matches) && isset($matches['1'])) {
+            $result = $matches['1'];
+        }
+        return $result;
+    }
+
     /**
      * Executes an, optionally parametrized, SQL query.
      *
@@ -137,27 +160,11 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     $params,
                     $types
                 );
+
             $myName = 'executeQuery';
-            $table = 'executeQuery: table not found';
+            $table = $this->determineTablename($expandedQuery);
 
-            if (strpos($expandedQuery, '`')) {
-                preg_match('/FROM `(\w+)`/s' , $expandedQuery, $matches);
-            } else {
-                preg_match('/FROM (\w+) /s' , $expandedQuery, $matches);
-            }
-
-            if (is_array($matches) && isset($matches['1'])) {
-                $table = $matches['1'];
-            }
-
-            $typeArray = ['SELECT', 'DELETE', 'UPDATE', 'INSERT'];
-            foreach ($typeArray as $type) {
-                if (substr($query, 0, strlen($type)) == $type) {
-                    break;
-                }
-            }
-
-            $this->myDebug($myName, $errorInfo, $type, $table, $expandedQuery, $stmt, $endtime - $starttime);
+            $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, '', $endtime - $starttime);
         }
     
         if ($this->debugOutput) {
@@ -166,6 +173,62 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
         return $stmt;
     }
+
+    /**
+     * Executes an SQL INSERT/UPDATE/DELETE query with the given parameters
+     * and returns the number of affected rows.
+     *
+     * This method supports PDO binding types as well as DBAL mapping types.
+     *
+     * @param string         $query  The SQL query.
+     * @param mixed[]        $params The query parameters.
+     * @param int[]|string[] $types  The parameter types.
+     *
+     * @return int The number of affected rows.
+     *
+     * @throws DBALException
+     */
+    public function executeUpdate ($query, array $params = [], array $types = [])
+    {
+        $myName = 'executeUpdate';
+        $starttime = microtime(true);
+        $affectedRows = parent::executeUpdate($query, $params, $types);
+        $endtime = microtime(true);
+        $errorCode = $this->errorCode();
+
+        if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
+            $errorInfo = null;
+            
+            if ($errorCode) {
+                $errorInfo = $errorCode . ':' . $this->errorInfo();
+            }
+
+            $expandedQuery = 
+                $this->doctrineApi->getExpandedQuery(
+                    $query,
+                    $params,
+                    $types
+                );
+
+            $table = $this->determineTablename($expandedQuery);
+            $type = '';
+            $typeArray = ['DELETE', 'UPDATE', 'INSERT'];
+            foreach ($typeArray as $type) {
+                if (substr($query, 0, strlen($type)) == $type) {
+                    break;
+                }
+            }
+
+            $this->myDebug($myName, $errorInfo, $type, $table, $expandedQuery, null, $affectedRows, $endtime - $starttime);
+        }
+    
+        if ($this->debugOutput) {
+            $this->debug($myName);
+        }
+
+        return $affectedRows;
+    }
+
 
     /**
      * Executes an SQL statement and return the number of affected rows.
@@ -195,7 +258,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             // TODO:
             $table = 'exec Test- Tabelle';
             $query = 'exec Test- Query';
-            $this->myDebug($myName, $errorInfo, 'SQL', $table, $query, $result, $endtime - $starttime);
+            $this->myDebug($myName, $errorInfo, 'SQL', $table, $query, $result, '', $endtime - $starttime);
         }
     
         if ($this->debugOutput) {
@@ -277,14 +340,26 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     * @param	string		mode
     * @param	string		table name
     * @param	string		SQL query
-    * @param	resource	SQL resource
+    * @param	resource	optional: SQL resource must implement the ResultStatement interfacee
+    * @param	integer	    optional: affected rows
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds)
+    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $affectedRows, $microseconds)
     {
-        $this->debugApi->myDebug($this, $func, $error, $mode, $table, $query, $resultSet, $microseconds);
+        if (
+            !MathUtility::canBeInterpretedAsInteger($affectedRows) &&
+            is_object($resultSet) &&
+            ($resultSet instanceof Doctrine\DBAL\Driver\ResultStatement)
+        ) {
+            $affectedRows = $resultSet->rowCount();
+        }
+
+        if ($mode == 'INSERT' || $mode == 'SQL') {
+            $insertId = $this->lastInsertId($table);
+        }
+
+        $this->debugApi->myDebug($this, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds);
     }
 }
  
-
