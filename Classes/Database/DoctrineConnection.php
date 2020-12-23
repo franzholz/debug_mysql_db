@@ -143,34 +143,41 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     public function executeQuery ($query, array $params = [], $types = [], ?\Doctrine\DBAL\Cache\QueryCacheProfile $qcp = null)
     {
         $starttime = microtime(true);
-        $stmt = parent::executeQuery($query, $params, $types, $qcp);
-        $endtime = microtime(true);
-        $errorCode = $this->errorCode();
+        $stmt = null;
+        try {
+            $stmt = parent::executeQuery($query, $params, $types, $qcp);
+        }
+        catch (DBALException $e) {
+            throw $e;
+        }
+        finally {
+            $endtime = microtime(true);
+            $errorCode = $this->errorCode();
 
-        if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
-            $errorInfo = null;
-            
-            if ($errorCode) {
-                $errorInfo = $errorCode . ':' . $this->errorInfo();
+            if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
+                $errorInfo = null;
+                
+                if ($errorCode) {
+                    $errorInfo = $errorCode . ':' . $this->errorInfo();
+                }
+
+                $expandedQuery = 
+                    $this->doctrineApi->getExpandedQuery(
+                        $query,
+                        $params,
+                        $types
+                    );
+
+                $myName = 'executeQuery';
+                $table = $this->determineTablename($expandedQuery);
+
+                $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, '', $endtime - $starttime);
             }
-
-            $expandedQuery = 
-                $this->doctrineApi->getExpandedQuery(
-                    $query,
-                    $params,
-                    $types
-                );
-
-            $myName = 'executeQuery';
-            $table = $this->determineTablename($expandedQuery);
-
-            $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, '', $endtime - $starttime);
+            if ($this->debugOutput) {
+                $this->debug('executeQuery');
+            }
         }
     
-        if ($this->debugOutput) {
-            $this->debug('executeQuery');
-        }
-
         return $stmt;
     }
 
