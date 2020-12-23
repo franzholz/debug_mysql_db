@@ -279,9 +279,13 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     */
     public function getEnableDisable ($sqlpart, $bErrorCase, &$bEnable, &$bDisable)
     {
-        $sqlpart = preg_replace('/[`"\'?*()]*(:dcValue[0-9]*)*/', '', $sqlpart);
         $bEnable = false;
         $bDisable = false;
+        if (strpos($sqlpart, 'table not found') !== false) {
+            $bEnable = true;
+            return;
+        }
+        $sqlpart = preg_replace('/[`"\'?*()]*(:dcValue[0-9]*)*/', '', $sqlpart);
         $strtokString = ',=<> ';
         $x = strtok($sqlpart, $strtokString);
 

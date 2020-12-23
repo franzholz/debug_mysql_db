@@ -111,7 +111,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
     public function determineTablename ($expandedQuery) 
     {
-        $result = 'executeQuery: table not found';
+        $result = 'table not found';
 
         if (strpos($expandedQuery, '`')) {
             preg_match('/FROM `(\w+)`/s' , $expandedQuery, $matches);
@@ -167,12 +167,12 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                         $params,
                         $types
                     );
-
                 $myName = 'executeQuery';
                 $table = $this->determineTablename($expandedQuery);
 
                 $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, '', $endtime - $starttime);
             }
+
             if ($this->debugOutput) {
                 $this->debug('executeQuery');
             }
