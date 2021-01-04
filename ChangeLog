@@ -1,3 +1,6 @@
+2021-01-04 Franz Holzinger <franz@ttproducts.de>
+    * add support for TYPO3 10.4
+
 2020-12-23 Franz Holzinger <franz@ttproducts.de>
     * enhancement for DoctrineConnection: Catch and rethrow the exception for method executeQuery in order to generate a debug output in the error case.
     * bugfix: output must be made in an error case when not table can be found due to a former exception
