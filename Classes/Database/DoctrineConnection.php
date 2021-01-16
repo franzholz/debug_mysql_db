@@ -109,14 +109,25 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         return true;
     }
 
-    public function determineTablename ($expandedQuery) 
+    public function determineTablename ($expandedQuery, $type) 
     {
         $result = 'table not found';
+        $sqlSearchWord = '';
+        switch ($type) {
+            case 'UPDATE':
+                 $sqlSearchWord = 'UPDATE';
+            break;
+            case 'INSERT':
+                 $sqlSearchWord = 'INTO';
+            break;
+            default:
+                $sqlSearchWord = 'FROM';
+        }
 
         if (strpos($expandedQuery, '`')) {
-            preg_match('/FROM `(\w+)`/s' , $expandedQuery, $matches);
+            preg_match('/'. $sqlSearchWord . ' `(\w+)`/s' , $expandedQuery, $matches);
         } else {
-            preg_match('/FROM (\w+) /s' , $expandedQuery, $matches);
+            preg_match('/' . $sqlSearchWord . ' (\w+) /s' , $expandedQuery, $matches);
         }
 
         if (is_array($matches) && isset($matches['1'])) {
@@ -168,7 +179,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                         $types
                     );
                 $myName = 'executeQuery';
-                $table = $this->determineTablename($expandedQuery);
+                $table = $this->determineTablename($expandedQuery, 'SELECT');
 
                 $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, '', $endtime - $starttime);
             }
@@ -217,7 +228,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     $types
                 );
 
-            $table = $this->determineTablename($expandedQuery);
             $type = '';
             $typeArray = ['DELETE', 'UPDATE', 'INSERT'];
             foreach ($typeArray as $type) {
@@ -225,6 +235,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     break;
                 }
             }
+            $table = $this->determineTablename($expandedQuery, $type);
 
             $this->myDebug($myName, $errorInfo, $type, $table, $expandedQuery, null, $affectedRows, $endtime - $starttime);
         }

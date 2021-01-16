@@ -1,3 +1,8 @@
+
+2021-01-16 Franz Holzinger <franz@ttproducts.de>
+    * bugfix: EXCLUDETABLES must be considered even if TABLES is not set to ALL
+    * bugfix in parsing of table name
+
 2021-01-04 Franz Holzinger <franz@ttproducts.de>
     * add support for TYPO3 10.4
 

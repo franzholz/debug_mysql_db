@@ -15,8 +15,9 @@ namespace Geithware\DebugMysqlDb\Api;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\DebugUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
 
 use Geithware\DebugMysqlDb\Database\DatabaseConnection;
 use Geithware\DebugMysqlDb\Database\DoctrineConnection;
@@ -83,15 +84,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
             strtoupper($this->dbgConf['TABLES']) == 'ALL' ||
             !trim($this->dbgConf['TABLES'])
         ) {
-            $this->dbgTable = ['all' => 1];
-
-            if ($this->dbgConf['EXCLUDETABLES'] != '') {
-                $tmp = GeneralUtility::trimExplode(',', $this->dbgConf['EXCLUDETABLES']);
-                $count = count($tmp);
-                for ($i = 0; $i < $count; $i++) {
-                    $this->dbgExcludeTable[strtolower($tmp[$i])] = 1;
-                }
-            }
+            $this->dbgTable['all'] = 1;
         } else {
             $tmp = GeneralUtility::trimExplode(',', $this->dbgConf['TABLES']);
             $count = count($tmp);
@@ -99,6 +92,24 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 $this->dbgTable[strtolower($tmp[$i])] = 1;
             }
         }
+
+        if (
+            ($this->dbgConf['EXCLUDETABLES'] != '') &&
+            (
+                $this->dbgTca ||
+                count($this->dbgTable)
+            )
+        ) {
+            $tmp = GeneralUtility::trimExplode(',', $this->dbgConf['EXCLUDETABLES']);
+            $count = count($tmp);
+            for ($i = 0; $i < $count; $i++) {
+                $table = strtolower($tmp[$i]);
+                if (!isset($this->dbgTable[$table])) {
+                    $this->dbgExcludeTable[$table] = 1;
+                }
+            }
+        }
+
         $tmp = GeneralUtility::trimExplode(',', $this->dbgConf['PAGES']);
         $count = count($tmp);
         for ($i = 0; $i < $count; $i++) {
@@ -127,9 +138,9 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     */
     public function myDebug ($pObj, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds)
     {
-        $debugArray = ['function/mode'=>'Pg' . $GLOBALS['TSFE']->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
-        $feUid = 0;
         $id = GeneralUtility::_GP('id');
+        $debugArray = ['function/mode'=>'Pg' . $id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
+        $feUid = 0;
 
         if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
             if (is_array($GLOBALS['TSFE']->fe_user->user)) {
@@ -312,10 +323,12 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 $lowerTable = $aliasArray['1'];
             }
             $lowerTable = trim($lowerTable);
-            $keyWords = ['select', 'transaction', 'commit', 'update', 'delete', 'from', 'where', 'order', 'by', 'sorting', 'desc'];
+            $keyWords = ['select', 'transaction', 'commit', 'update', 'delete', 'from', 'where', 'order', 'by', 'sorting', 'desc', 'insert', 'into', 'set', 'group', 'and', 'or'];
 
-            if (!in_array($lowerTable, $keyWords)) {
-    
+            if (
+                !in_array($lowerTable, $keyWords) &&
+                !MathUtility::canBeInterpretedAsInteger($lowerTable)
+            ) {
                 if (
                     $this->dbgExcludeTable[$lowerTable]
                 ) {
