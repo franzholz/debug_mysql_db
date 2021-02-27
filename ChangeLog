@@ -1,3 +1,5 @@
+2021-02-27 Franz Holzinger <franz@ttproducts.de>
+    * enhancement for backtrace: New option BTRACE_LIMIT to set the limit of characters for the backtrace
 
 2021-01-16 Franz Holzinger <franz@ttproducts.de>
     * bugfix: EXCLUDETABLES must be considered even if TABLES is not set to ALL

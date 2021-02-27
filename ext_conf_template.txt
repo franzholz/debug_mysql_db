@@ -16,6 +16,8 @@ PAGES = 0
 FEUSERS = 0
   # cat=basic/conf; type=boolean; label= Add Backtrace: Set to 1, if you need debug_backtrace for all sql() and sql_query() calls
 BTRACE_SQL = 0
+  # cat=basic/conf; type=integer; label= Backtrace limi: Maximum number of characters contained in the debug backtrace
+BTRACE_LIMIT = 256
   # cat=basic/conf; type=text; label= Output: Destination of the debug info. possible Values: \TYPO3\CMS\Utility\DebugUtility::debug, debug, error_log (see TEXTFORMAT)
 OUTPUT = \TYPO3\CMS\Utility\DebugUtility::debug
   # cat=basic/conf; type=boolean; label= Textformat: defines that the output is only in text format and not an array as for debug. Arrays are converted into normal text before the output function is called. Use this if you have set error_log as OUTPUT.
@@ -26,3 +28,5 @@ TCA = 0
 TICKER =
   # cat=basic/conf; type=integer; label= File Writer: Activate the File Writer to debug SQL messages in the file typo3temp/log/database_%s.log'. 1 ... use the debug . 2 ... use the file writer, 3 use both
 FILEWRITER = 0
+
+

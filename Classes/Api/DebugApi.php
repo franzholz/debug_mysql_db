@@ -121,7 +121,20 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
             $this->dbgFeUser[intval($tmp[$i]) . '.'] = 1;
         }
     }
-    
+
+    public function debugTrail ($prependFileNames = false)
+    {
+        $trail = DebugUtility::debugTrail($prependFileNames);
+        if ($this->dbgConf['BTRACE_LIMIT']) {
+            $search = '// Geithware';
+            $position1 = strpos($trail, $search);
+            $position2 = strpos($trail, $search, $position1 + 1);
+            $trail = substr($trail, 0, $position2);
+            $trail = substr($trail, -$this->dbgConf['BTRACE_LIMIT']);
+        }
+        return $trail;
+    }
+     
     /**
     * Debug function: Outputs error if any
     *
@@ -182,7 +195,9 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                         $debugArray['lastBuiltQuery'] = $query;
                     }
 
-                    $debugArray['debug_backtrace'] =  DebugUtility::debugTrail();
+                    if ($this->dbgConf['BTRACE_SQL']) {
+                        $debugArray['debug_backtrace'] =  $this->debugTrail();
+                    }
                     $debugArray['miliseconds'] = round($microseconds * 1000, 3);
 
                     if (
@@ -243,9 +258,9 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
 
                 if ($this->dbgConf['BTRACE_SQL']) {
 
-                    $debugArray['debug_backtrace'] =  DebugUtility::debugTrail();
+                    $debugArray['debug_backtrace'] =  $this->debugTrail();
                 }
-                $debugArray['miliseconds'] = round($microseconds * 1000,3);
+                $debugArray['miliseconds'] = round($microseconds * 1000, 3);
                 $debugArray['------------'] = '';
 
                 if ($this->dbgTextformat) {
