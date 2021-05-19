@@ -4,7 +4,7 @@ $EM_CONF[$_EXTKEY] = [
     'title' => 'Debug Mysql or other DB',
     'description' => 'Extends \\TYPO3\\CMS\\Core\\Database\\DatabaseConnection and \\TYPO3\\CMS\\Core\\Database\\Connection to show Errors and Debug-Messages. Debugging of sql-queries by debug and FileWriter.',
     'category' => 'misc',
-    'version' => '1.0.1',
+    'version' => '1.1.0',
     'state' => 'stable',
     'uploadfolder' => 0,
     'clearcacheonload' => 0,
@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
 	'author_company' => 'jambage.com',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.7.0-10.4.99',
+            'typo3' => '8.7.0-11.99.99',
         ],
         'suggests' => [
             'typo3db_legacy' => '1.0.0-1.1.99',
