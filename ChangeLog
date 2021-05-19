@@ -1,3 +1,6 @@
+2021-04-16 Franz Holzinger <franz@ttproducts.de>
+    * works with TYPO3 11
+
 2021-02-27 Franz Holzinger <franz@ttproducts.de>
     * enhancement for backtrace: New option BTRACE_LIMIT to set the limit of characters for the backtrace
 
