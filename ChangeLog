@@ -1,3 +1,6 @@
+2021-10-30 Franz Holzinger <franz@ttproducts.de>
+    * fix debug_backtrace
+
 2021-04-16 Franz Holzinger <franz@ttproducts.de>
     * works with TYPO3 11
 

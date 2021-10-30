@@ -23,7 +23,7 @@
     "GPL-2.0-or-later"
   ],
   "require": {
-    "typo3/cms-core": "^8.7 || ^9.5 || ^10.4 || ^11.3"
+    "typo3/cms-core": "^8.7 || ^9.5 || ^10.4 || ^11.5"
   },
   "autoload": {
     "psr-4": {
@@ -31,8 +31,7 @@
     }
   },
   "replace": {
-    "geithware/debug-mysql-db": "self.version",
-    "typo3-ter/debug-mysql-db": "self.version"
+    "geithware/debug-mysql-db": "self.version"
   },
   "extra": {
     "typo3/cms": {

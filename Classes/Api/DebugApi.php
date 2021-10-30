@@ -127,9 +127,8 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
         $trail = DebugUtility::debugTrail($prependFileNames);
         if ($this->dbgConf['BTRACE_LIMIT']) {
             $search = '// Geithware';
-            $position1 = strpos($trail, $search);
-            $position2 = strpos($trail, $search, $position1 + 1);
-            $trail = substr($trail, 0, $position2);
+            $position = strpos($trail, $search);
+            $trail = substr($trail, 0, $position - 1);
             $trail = substr($trail, -$this->dbgConf['BTRACE_LIMIT']);
         }
         return $trail;
