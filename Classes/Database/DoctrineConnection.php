@@ -181,7 +181,9 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 $myName = 'executeQuery';
                 $table = $this->determineTablename($expandedQuery, 'SELECT');
 
-                $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, '', $endtime - $starttime);
+                $affectedRows = '';
+                $microseconds = $endtime - $starttime;
+                $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, $affectedRows, $microseconds);
             }
 
             if ($this->debugOutput) {
@@ -380,4 +382,4 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $this->debugApi->myDebug($this, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds);
     }
 }
- 
+
