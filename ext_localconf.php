@@ -2,18 +2,9 @@
 defined('TYPO3_MODE') || die('Access denied.');
 
 call_user_func(function () {
-    $extensionConfiguration = array();
-
-    if (
-        defined('TYPO3_version') &&
-        version_compare(TYPO3_version, '9.0.0', '>=')
-    ) {
-        $extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-            \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
-        )->get('debug_mysql_db');
-    } else { // before TYPO3 9
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db']);
-    }
+    $extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+        \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+    )->get('debug_mysql_db');
 
     if (class_exists('TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection')) {
         if (is_object($GLOBALS['TYPO3_DB'])) {
@@ -90,18 +81,6 @@ call_user_func(function () {
 
         $GLOBALS['TYPO3_DB'] = $databaseConnection;
         $GLOBALS['TYPO3_DB']->initialize();
-    } else if (
-        defined('TYPO3_version') &&
-        version_compare(TYPO3_version, '9.0.0', '<')
-    ) {
-        $dbgMode = $extensionConfiguration['TYPO3_MODE'] ? trim(strtoupper($extensionConfiguration['TYPO3_MODE'])) : 'OFF';
-
-        if (TYPO3_MODE == $dbgMode || $dbgMode == 'ALL') {
-
-            $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\DatabaseConnection'] = array(
-                'className' => \Geithware\DebugMysqlDb\Database\DatabaseConnection::class
-            );
-        }
     }
 
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\Connection'] = array(
