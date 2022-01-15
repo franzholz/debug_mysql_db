@@ -45,17 +45,10 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
      */
     public function initialize ()
     {
-        $extensionConfiguration = [];
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db'])) {
-            $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db']);
-        } else if (
-            version_compare(TYPO3_version, '9.0.0', '>=')
-        ) {
-            $extensionConfiguration =
-                \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                    \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
-                )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
-        }
+        $extensionConfiguration =
+            \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 

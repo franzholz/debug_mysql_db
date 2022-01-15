@@ -13,11 +13,11 @@ $EM_CONF[$_EXTKEY] = [
 	'author_company' => 'jambage.com',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.7.0-11.99.99',
+            'typo3' => '9.5.0-11.99.99',
         ],
         'suggests' => [
             'typo3db_legacy' => '1.0.0-1.1.99',
-            'fh_debug' => '0.8.0-0.9.99',
+            'fh_debug' => '0.9.0-0.10.99',
         ],
     ]
 ];

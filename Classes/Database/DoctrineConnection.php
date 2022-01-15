@@ -66,17 +66,10 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     public function __construct (array $params, Driver $driver, Configuration $config = null, EventManager $em = null)
     {
         parent::__construct($params, $driver, $config, $em);
-        $extensionConfiguration = [];
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db'])) {
-            $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['debug_mysql_db']);
-        } else if (
-            version_compare(TYPO3_version, '9.0.0', '>=')
-        ) {
-            $extensionConfiguration =
-                \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                    \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
-                )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
-        }
+        $extensionConfiguration =
+            \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->debugUtilityErrors = (intval($extensionConfiguration['DEBUGUTILITY_ERRORS'])) ? true : false;
 
@@ -367,6 +360,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     */
     public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $affectedRows, $microseconds)
     {
+        $insertId = '';
         if (
             !MathUtility::canBeInterpretedAsInteger($affectedRows) &&
             is_object($resultSet) &&

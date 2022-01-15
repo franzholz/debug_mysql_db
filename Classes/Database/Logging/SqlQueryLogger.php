@@ -92,6 +92,11 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
             return;
         }
 
+        $extensionConfiguration =
+            GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
+
         $debugApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DebugApi::class, $extensionConfiguration);
 
         // Maybe no logger is instantiated in TYPO3 8.7 
@@ -101,7 +106,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
 
         $paramString = null;
         if (is_array($this->currentQuery['params'])) {
-            $paramString = implode('', $this->currentQuery['params']);
+            $paramString = json_encode($this->currentQuery['params']);
         }
         $dbalException = (strpos($paramString, 'DBALException') > 0 || strpos($paramString, 'DriverException') > 0);
 
@@ -112,9 +117,6 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
             $queries[] = $this->lastQuery;
         }
         $queries[] = $this->currentQuery;
-
-        
-        
 
         foreach($queries as $query) {
         

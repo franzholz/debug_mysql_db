@@ -54,6 +54,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ? $this->dbgConf['OUTPUT'] : '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
         $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ? $this->dbgConf['TEXTFORMAT'] : false;
         $this->dbgTca = $this->dbgConf['TCA'] ? $this->dbgConf['TCA'] : false;
+        $this->dbgTable['all'] = 0;
 
         if (
             strtoupper($this->dbgConf['QUERIES']) == 'ALL' ||
@@ -239,7 +240,9 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                     $this->dbgFeUser[$feUid . '.']
                 ) &&
                 (
+                    isset($this->dbgId[$id . '.']) &&
                     $this->dbgId[$id . '.'] ||
+                    isset($this->dbgId['0.']) &&
                     $this->dbgId['0.']
                 )
             ) {
@@ -278,6 +281,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
         try {
             if (
                 $debugFunc == 'debug' &&
+                isset($GLOBALS['error']) &&
                 is_object($GLOBALS['error']) &&
                 @is_callable([$GLOBALS['error'], 'debug'])
             ) {
@@ -344,6 +348,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 !MathUtility::canBeInterpretedAsInteger($lowerTable)
             ) {
                 if (
+                    isset($this->dbgExcludeTable[$lowerTable]) &&
                     $this->dbgExcludeTable[$lowerTable]
                 ) {
                     $bDisable = true;
@@ -359,6 +364,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                         $this->dbgTable['all']  &&
                         in_array($lowerTable, $this->typo3Tables)
                     ) ||
+                    isset($this->dbgTable[$lowerTable]) &&
                     $this->dbgTable[$lowerTable]
                 ) { // is this a table name inside of TYPO3?
                     $bEnable = true;
