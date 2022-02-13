@@ -189,11 +189,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 ) {
                     $debugArray['function/mode'] .= $this->getTraceLine();
                     $debugArray['SQL ERROR ='] = $error;
-                    if ($this->debug_lastBuiltQuery != '') {
-                        $debugArray['lastBuiltQuery'] = $this->debug_lastBuiltQuery;
-                    } else {
-                        $debugArray['lastBuiltQuery'] = $query;
-                    }
+                    $debugArray['lastBuiltQuery'] = $query;
 
                     if ($this->dbgConf['BTRACE_SQL']) {
                         $debugArray['debug_backtrace'] =  $this->debugTrail();

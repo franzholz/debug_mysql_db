@@ -57,7 +57,7 @@ class DoctrineApi implements \TYPO3\CMS\Core\SingletonInterface {
                     if (is_array($value)) {
                         $newValueArray = [];
                         foreach ($value as $subValue) {
-                            $newValueArray[] = '\'' . $value . '\'';
+                            $newValueArray[] = '\'' . $subValue . '\'';
                         }
                         $value = implode(',', $newValueArray);
                     } else {

@@ -324,7 +324,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 [
                     'caller' => \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection::class . '::' . $func,
                     'ERROR' => $errorCode . ':' . $errorInfo,
-                    'lastBuiltQuery' => $query ? $query : $this->debug_lastBuiltQuery,
+                    'lastBuiltQuery' => $query,
                     'debug_backtrace' => \TYPO3\CMS\Core\Utility\DebugUtility::debugTrail()
                 ];
 

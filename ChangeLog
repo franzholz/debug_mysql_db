@@ -1,3 +1,10 @@
+2022-02-13 Franz Holzinger <franz@ttproducts.de>
+    * bugfix: Doctrine API
+
+2022-02-01 Franz Holzinger <franz@ttproducts.de>
+    * bugfix: PARAM_STR_ARRAY must be treated as array
+    * bugfix: There is no member variable debug_lastBuiltQuery .
+
 2022-01-15 Franz Holzinger <franz@ttproducts.de>
     * remove code for TYPO3 < 9
     * bugfix for PHP 8 and TYPO3 11

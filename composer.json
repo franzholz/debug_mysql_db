@@ -27,7 +27,7 @@
   },
   "suggest": {
     "friendsoftypo3/typo3db-legacy": "^1.0",
-    "jambagecom/fh-debug": "^0.9"
+    "jambagecom/fh-debug": "^0.11"
   },
   "autoload": {
     "psr-4": {
