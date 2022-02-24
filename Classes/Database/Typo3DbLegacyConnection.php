@@ -511,6 +511,7 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     {
         $result = false;
         $affectedRowsCount = $this->sql_affected_rows();
+
         if ($affectedRowsCount) {
             $result = $this->sql_insert_id();
         }

@@ -328,7 +328,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     {
         $tablePart = trim ($tablePart);
 
-        if ($tablePart != '') {
+        if (strlen($tablePart) > 1) {
             $partArray = explode('.', $tablePart);
             $lowerTable = strtolower($partArray['0']);
             $aliasArray = explode(' ', $lowerTable);

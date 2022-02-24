@@ -1,3 +1,6 @@
+2022-02-24 Franz Holzinger <franz@ttproducts.de>
+    * bugfix: The minimum size of a SQL part must be 2 characters.
+
 2022-02-13 Franz Holzinger <franz@ttproducts.de>
     * bugfix: Doctrine API
 
