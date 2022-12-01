@@ -1,3 +1,9 @@
+2022-12-01 Franz Holzinger  <franz@ttproducts.de>
+    * compatibility: Migrate extension icon to Resources/Public/Icons/Extension.gif
+
+2022-08-03 Franz Holzinger <franz@ttproducts.de>
+    * bugfix: num_rows only works with Doctrine class comparison for instance of result set with leading backslash
+
 2022-02-24 Franz Holzinger <franz@ttproducts.de>
     * bugfix: The minimum size of a SQL part must be 2 characters.
 

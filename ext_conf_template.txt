@@ -18,8 +18,8 @@ PAGES = 0
 FEUSERS = 0
   # cat=basic/conf; type=boolean; label= Add Backtrace: Set to 1, if you need debug_backtrace for all sql() and sql_query() calls
 BTRACE_SQL = 0
-  # cat=basic/conf; type=int+; label= Backtrace limi: Maximum number of characters contained in the debug backtrace
-BTRACE_LIMIT = 32
+  # cat=basic/conf; type=int+; label= Backtrace limit: Maximum number of characters contained in the debug backtrace
+BTRACE_LIMIT = 256
   # cat=basic/conf; type=boolean; label= Textformat: defines that the output is only in text format and not an array as for debug. Arrays are converted into normal text before the output function is called. Use this if you have set error_log as OUTPUT.
 TEXTFORMAT = 0
   # cat=basic/conf; type=boolean; label= TCA: defines that the $GLOBALS['TCA'] for a table must be set to generate an output

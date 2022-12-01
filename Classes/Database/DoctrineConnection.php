@@ -364,7 +364,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if (
             !MathUtility::canBeInterpretedAsInteger($affectedRows) &&
             is_object($resultSet) &&
-            ($resultSet instanceof Doctrine\DBAL\Driver\ResultStatement)
+            ($resultSet instanceof \Doctrine\DBAL\Driver\ResultStatement)
         ) {
             $affectedRows = $resultSet->rowCount();
         }
