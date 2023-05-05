@@ -286,7 +286,7 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
             $mmWhere .= ($foreign_table_as ?: $foreign_table) . '.uid=' . $mm_table . '.uid_foreign';
             $tables .= ',' . $foreign_table . ($foreign_table_as ? ' AS ' . $foreign_table_as : '');
         }
-        return $this->exec_SELECTquery($select, $tables, $mmWhere . ' ' . $whereClause, $groupBy, $orderBy, $limit, Array('name' => 'exec_SELECT_mm_query'));
+        return $this->exec_SELECTquery($select, $tables, $mmWhere . ' ' . $whereClause, $groupBy, $orderBy, $limit, ['name' => 'exec_SELECT_mm_query']);
     }
 
     /**
@@ -298,7 +298,7 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     */
     public function exec_SELECT_queryArray ($queryParts)
     {
-        return $this->exec_SELECTquery($queryParts['SELECT'], $queryParts['FROM'], $queryParts['WHERE'], $queryParts['GROUPBY'], $queryParts['ORDERBY'], $queryParts['LIMIT'], array('name' => 'exec_SELECT_queryArray'));
+        return $this->exec_SELECTquery($queryParts['SELECT'], $queryParts['FROM'], $queryParts['WHERE'], $queryParts['GROUPBY'], $queryParts['ORDERBY'], $queryParts['LIMIT'], ['name' => 'exec_SELECT_queryArray']);
     }
 
     /**
@@ -315,14 +315,14 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     */
     public function exec_SELECTgetRows ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $uidIndexField = '')
     {
-        $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, array('name' => 'exec_SELECTgetRows'));
+        $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, ['name' => 'exec_SELECTgetRows']);
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
         }
         if ($this->sql_error()) {
             return null;
         }
-        $output = array();
+        $output = [];
         $firstRecord = true;
         while ($record = $this->sql_fetch_assoc($resultSet)) {
             if ($uidIndexField) {
@@ -356,7 +356,7 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     */
     public function exec_SELECTgetSingleRow ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $numIndex = false)
     {
-        $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, '1', array('name' => 'exec_SELECTgetSingleRow'));
+        $resultSet = $this->exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, '1', ['name' => 'exec_SELECTgetSingleRow']);
         if ($this->debugOutput) {
             $this->debug('exec_SELECTquery');
         }
@@ -383,7 +383,7 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     public function exec_SELECTcountRows ($field, $table, $where = '')
     {
         $count = false;
-        $resultSet = $this->exec_SELECTquery('COUNT(' . $field . ')', $table, $where, '', '', '', array('name' => 'exec_SELECTcountRows'));
+        $resultSet = $this->exec_SELECTquery('COUNT(' . $field . ')', $table, $where, '', '', '', ['name' => 'exec_SELECTcountRows']);
         if ($resultSet !== false) {
             list($count) = $this->sql_fetch_row($resultSet);
             $count = (int) $count;
@@ -410,11 +410,11 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     * @param array $input_parameters An array of values with as many elements as there are bound parameters in the SQL statement being executed. All values are treated as \TYPO3\CMS\Core\Database\PreparedStatement::PARAM_AUTOTYPE.
     * @return \TYPO3\CMS\Core\Database\PreparedStatement Prepared statement
     */
-    public function prepare_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', array $input_parameters = array())
+    public function prepare_SELECTquery ($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', array $input_parameters = [])
     {
-        $query = $this->SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, array('name' => 'prepare_SELECTquery'));
+        $query = $this->SELECTquery($select_fields, $from_table, $where_clause, $groupBy, $orderBy, $limit, ['name' => 'prepare_SELECTquery']);
         /** @var $preparedStatement \TYPO3\CMS\Core\Database\PreparedStatement */
-        $preparedStatement = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\PreparedStatement', $query, $from_table, array());
+        $preparedStatement = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\PreparedStatement', $query, $from_table, []);
         // Bind values to parameters
         foreach ($input_parameters as $key => $value) {
             $preparedStatement->bindValue($key, $value, PreparedStatement::PARAM_AUTOTYPE);

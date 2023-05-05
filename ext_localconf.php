@@ -1,5 +1,5 @@
 <?php
-defined('TYPO3_MODE') || die('Access denied.');
+defined('TYPO3') || die('Access denied.');
 
 call_user_func(function () {
     $extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
@@ -11,9 +11,9 @@ call_user_func(function () {
             $GLOBALS['TYPO3_DB']->__sleep();
         }
 
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection'] = array(
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection'] = [
             'className' => \Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection::class
-        );
+        ];
 
         //**********************************************
         //*** copied from extension typo3db_legacy:
@@ -83,9 +83,9 @@ call_user_func(function () {
         $GLOBALS['TYPO3_DB']->initialize();
     }
 
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\Connection'] = array(
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\Connection'] = [
         'className' => \Geithware\DebugMysqlDb\Database\DoctrineConnection::class
-    );
+    ];
     
     $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][\TYPO3\CMS\Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME]['wrapperClass'] = \Geithware\DebugMysqlDb\Database\DoctrineConnection::class;
 

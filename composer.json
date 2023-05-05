@@ -23,7 +23,7 @@
     "GPL-2.0-or-later"
   ],
   "require": {
-    "typo3/cms-core": "^9.5 || ^10.4 || ^11.5"
+    "typo3/cms-core": "^10.4 || ^11.5 || ^12.3"
   },
   "suggest": {
     "friendsoftypo3/typo3db-legacy": "^1.0",
