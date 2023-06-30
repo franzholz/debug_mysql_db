@@ -1,6 +1,7 @@
 
 
 2023-06-30 Franz Holzinger  <franz@ttproducts.de>
+    * compatibility: errorCode() is deprecated. Use getCode() or getSQLState() on Exception.
     * compatibility: Method errorInfo has been removed in TYPO3 12.
     * use base class Doctrine\DBAL\Driver instead of Doctrine\DBAL\Driver\Mysqli\Driver to support all drivers.
 

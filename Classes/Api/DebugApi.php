@@ -283,14 +283,12 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 is_object($GLOBALS['error']) &&
                 @is_callable([$GLOBALS['error'], 'debug'])
             ) {
-//                 $GLOBALS['error']->debug('B');
                 $GLOBALS['error']->debug($error, 'callDebugger $error');
                 $GLOBALS['error']->debug(
                     $debugOut, 
                     'SQL debug' . ($error ? '*ERROR*' : ''),
                     ($error ? 'F' : null)
                 );
-//                 $GLOBALS['error']->debug('E');
             } else if (function_exists($debugFunc) && is_callable($debugFunc)) {
                 call_user_func($debugFunc, $debugOut, 'SQL debug');
             } else {
