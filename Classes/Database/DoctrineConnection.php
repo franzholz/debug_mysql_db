@@ -21,7 +21,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver\Mysqli\Driver;
+use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\SQLParserUtils;
 use Exception;
 
@@ -332,11 +332,14 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 \TYPO3\CMS\Core\Utility\DebugUtility::debug(
                     $errorDebug,
                     $func,
-                    is_object($GLOBALS['error']) && @is_callable([$GLOBALS['error'], 'debug'])
+                    isset($GLOBALS['error']) &&
+                    is_object($GLOBALS['error']) && 
+                    @is_callable([$GLOBALS['error'], 'debug'])
                         ? ''
                         : 'DB Error'
                 );
             } else if (
+                isset($GLOBALS['error']) &&
                 is_object($GLOBALS['error']) &&
                 @is_callable([$GLOBALS['error'], 'debug'])
             ) {

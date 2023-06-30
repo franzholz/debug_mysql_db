@@ -1,3 +1,9 @@
+
+
+2023-06-30 Franz Holzinger  <franz@ttproducts.de>
+    * compatibility: Method errorInfo has been removed in TYPO3 12.
+    * use base class Doctrine\DBAL\Driver instead of Doctrine\DBAL\Driver\Mysqli\Driver to support all drivers.
+
 2022-12-01 Franz Holzinger  <franz@ttproducts.de>
     * compatibility: Migrate extension icon to Resources/Public/Icons/Extension.gif
 
