@@ -306,7 +306,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     }
 
     /**
-    * Determines if the debug output should be displayed. An error message or a time comsuming SQL query shall be displayed.
+    * Determines if the debug output should be displayed. An error message or a time consuming SQL query shall be displayed.
     *
     * @param	string		error text
     * @param	float		startime of mysql-command
