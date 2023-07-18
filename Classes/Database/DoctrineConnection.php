@@ -212,6 +212,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $starttime = microtime(true);
         $errorCode = 0;
         $errorInfo = null;
+        $affectedRows = '';
 
         try {
             $affectedRows = parent::executeUpdate($query, $params, $types);
@@ -246,7 +247,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     }
                 }
                 $table = $this->determineTablename($expandedQuery, $type);
-
                 $this->myDebug($myName, $errorInfo, $type, $table, $expandedQuery, null, $affectedRows, $endtime - $starttime);
             }
         }
