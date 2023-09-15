@@ -1,0 +1,26 @@
+--- /home/franz/Downloads/TYPO3/typo3_src-12.4.6/typo3/sysext/install/Classes/ServiceProvider.php	2023-09-12 08:54:01.000000000 +0200
++++ TYPO3/sysext/install/Classes/ServiceProvider.php	2023-09-15 16:00:22.438795476 +0200
+@@ -293,6 +293,11 @@
+ 
+     public static function getMaintenanceController(ContainerInterface $container): Controller\MaintenanceController
+     {
++        // FHO Anfang
++        $lateBootService = $container->get(Service\LateBootService::class);
++        $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
++        // FHO Ende
++
+         return new Controller\MaintenanceController(
+             $container->get(Service\LateBootService::class),
+             $container->get(Service\ClearCacheService::class),
+@@ -306,6 +311,11 @@
+ 
+     public static function getSettingsController(ContainerInterface $container): Controller\SettingsController
+     {
++         // FHO Anfang
++        $lateBootService = $container->get(Service\LateBootService::class);
++        $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
++        // FHO Ende
++
+         return new Controller\SettingsController(
+             $container->get(PackageManager::class),
+             $container->get(LanguageServiceFactory::class),

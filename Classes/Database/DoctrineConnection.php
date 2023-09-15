@@ -212,6 +212,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $starttime = microtime(true);
         $errorCode = 0;
         $errorInfo = null;
+        $errorMessage = '';
         $affectedRows = '';
 
         try {
@@ -222,6 +223,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
             $errorCode = $e->getCode();
             $errorInfo = $e->errorInfo();
+            $errorMessage = $e->getMessage();
         }
         finally {
             $endtime = microtime(true);
@@ -229,7 +231,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
                 if ($errorCode > 0) {
                     $errorInfo = $errorInfo[0] . ' ' . $errorInfo[1] ?? '' . ' ' . $errorInfo[2] ?? '';
-                    $errorInfo = $errorCode . ':' . $errorInfo;
+                    $errorInfo = $errorCode . ':' . $errorInfo . ':' . $errorMessage;
                 }
 
                 $expandedQuery = 
