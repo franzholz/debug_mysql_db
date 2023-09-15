@@ -31,9 +31,9 @@ Installtool Requirement
 The class override mechanism has been deactivated in the TYPO3 core for the install tool.
 
 To reactivate it again you must overwrite the TYPO3 Core file
-file:`sysext/install/Classes/ServiceProvider.php` by the file
-file:`debug_mysql_db/Patches/TYPO3/sysext/install/Classes/ServiceProvider.php`.
-Or you apply the patch file file:`debug_mysql_db/Patches/ServiceProvider.diff` on the TYPO3 core.
+``sysext/install/Classes/ServiceProvider.php`` by the file
+``debug_mysql_db/Patches/TYPO3/sysext/install/Classes/ServiceProvider.php``.
+Or you apply the patch file ``debug_mysql_db/Patches/ServiceProvider.diff`` on the TYPO3 core.
 
 Alternatively you can use "post-install-cmd" or "post-autoload-dump" and a file copy method in your composer.json.
 See `Defining scripts <https://getcomposer.org/doc/articles/scripts.md#defining-scripts>`__ .
