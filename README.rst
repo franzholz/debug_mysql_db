@@ -22,7 +22,7 @@ Problems
 
 * The debug output is not generated within some parts of the Install Tool.
     see   `TYPO3 Core issue no. 99434 <https://forge.typo3.org/issues/99434/>`_
-    Solution: See file patch-99434-2.diff in the Patches subfolder.
+    Solution: See file ServiceProvider.diff in the Patches subfolder.
 
 
 Installtool Requirement
