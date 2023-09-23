@@ -234,6 +234,10 @@ class ServiceProvider extends AbstractServiceProvider
 
     public static function getMaintenanceMiddleware(ContainerInterface $container): Middleware\Maintenance
     {
+        // FHO Anfang
+        $lateBootService = $container->get(Service\LateBootService::class);
+        $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
+        // FHO Ende
         return new Middleware\Maintenance(
             $container->get(FailsafePackageManager::class),
             $container->get(ConfigurationManager::class),
@@ -245,6 +249,10 @@ class ServiceProvider extends AbstractServiceProvider
 
     public static function getEnvironmentController(ContainerInterface $container): Controller\EnvironmentController
     {
+        // FHO Anfang
+        $lateBootService = $container->get(Service\LateBootService::class);
+        $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
+        // FHO Ende
         return new Controller\EnvironmentController(
             $container->get(Service\LateBootService::class),
             $container->get(FormProtectionFactory::class),
@@ -311,7 +319,7 @@ class ServiceProvider extends AbstractServiceProvider
 
     public static function getSettingsController(ContainerInterface $container): Controller\SettingsController
     {
-         // FHO Anfang
+        // FHO Anfang
         $lateBootService = $container->get(Service\LateBootService::class);
         $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
         // FHO Ende

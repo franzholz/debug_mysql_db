@@ -62,6 +62,11 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
         ) {
             $this->dbgQuery = [
                 'ALL' => 1,
+                'ALTER' => 1,
+                'CREATE' => 1,
+                'DROP' => 1,
+                'GRANT' => 1,
+                'REVOKE' => 1,
                 'SQL' => 1,
                 'SELECT' => 1,
                 'INSERT' => 1,
@@ -127,7 +132,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     {
         $trail = DebugUtility::debugTrail($prependFileNames);
 
-        if ($this->dbgConf['BTRACE_LIMIT']) {
+        if (!empty($this->dbgConf['BTRACE_LIMIT'])) {
             $search = '// Geithware';
             $position = strpos($trail, $search);
             $trail = substr($trail, 0, $position - 1);
@@ -152,13 +157,19 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     */
     public function myDebug ($pObj, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds)
     {
-        $id = GeneralUtility::_GP('id');
-        $debugArray = ['function/mode'=>'Pg' . $id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
+        $id = '0';
         $feUid = 0;
 
-        if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
-            if (is_array($GLOBALS['TSFE']->fe_user->user)) {
-                $feUid = intval($GLOBALS['TSFE']->fe_user->user['uid']);
+        if (
+            isset($GLOBALS['TSFE']) &&
+            is_object($GLOBALS['TSFE'])
+        ) {
+            $id = $GLOBALS['TSFE']->determineId();
+
+            if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
+                if (is_array($GLOBALS['TSFE']->fe_user->user)) {
+                    $feUid = intval($GLOBALS['TSFE']->fe_user->user['uid']);
+                }
             }
         }
 
@@ -167,6 +178,8 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
         } else {
             $sqlPart = $query;
         }
+
+        $debugArray = ['function/mode'=>'Pg' . $id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
 
         if ($error) {
             if (!intval($this->dbgConf['DISABLE_ERRORS'])) {
@@ -183,7 +196,7 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                         $this->dbgTca
                     ) &&
                     (
-                        $this->dbgTable['all'] ||
+                        !empty($this->dbgTable['all']) ||
                         $bEnable ||
                         !$table
                     )
@@ -226,16 +239,16 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
             );
 
             if (
-                $this->dbgQuery[$mode] &&
+                !empty($this->dbgQuery[$mode]) &&
                 !$bDisable &&
                 (
-                    $this->dbgTable['all'] ||
+                    !empty($this->dbgTable['all']) ||
                     $bEnable ||
                     !$table
                 ) &&
                 (
                     count($this->dbgFeUser) == 0 ||
-                    $this->dbgFeUser[$feUid . '.']
+                    !empty($this->dbgFeUser[$feUid . '.'])
                 ) &&
                 (
                     isset($this->dbgId[$id . '.']) &&
@@ -283,7 +296,9 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 is_object($GLOBALS['error']) &&
                 @is_callable([$GLOBALS['error'], 'debug'])
             ) {
-                $GLOBALS['error']->debug($error, 'callDebugger $error');
+                if (!empty($error)) {
+                    $GLOBALS['error']->debug($error, 'DebugApi::callDebugger $error');
+                }
                 $GLOBALS['error']->debug(
                     $debugOut, 
                     'SQL debug' . ($error ? '*ERROR*' : ''),

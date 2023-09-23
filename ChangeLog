@@ -1,4 +1,8 @@
+2023-09-23 Franz Holzinger  <franz@ttproducts.de>
+    * bugfix: show a Doctrine exception as ERROR in the debug output
 
+2023-09-16 Franz Holzinger  <franz@ttproducts.de>
+    * new feature: Add support for ALTER TABLE
 
 2023-06-30 Franz Holzinger  <franz@ttproducts.de>
     * compatibility: errorCode() is deprecated. Use getCode() or getSQLState() on Exception.

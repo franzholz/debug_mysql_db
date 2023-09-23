@@ -21,7 +21,8 @@ use Doctrine\DBAL\Connection;
 class DoctrineApi implements \TYPO3\CMS\Core\SingletonInterface {
 
     // mit QueryBuilder Methode ergänzen
-    public function getExpandedQuery ($query, $params, $types) {
+    public function getExpandedQuery ($query, $params, $types)
+    {
         $questionmarkMode = 
             strpos($query, '(?') || 
             strpos($query, '= ?');

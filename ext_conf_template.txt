@@ -6,7 +6,7 @@ OUTPUT = \TYPO3\CMS\Utility\DebugUtility::debug
 DISABLE_ERRORS = 0
   # cat=basic/conf; type=boolean; label= Use debug utility for errors: If set and an error occurs, all error messages are sent to \TYPO3\CMS\Core\Utility\DebugUtility::debug as well as to the debug method if available.
 DEBUGUTILITY_ERRORS = 0
-  # cat=basic/conf; type=text; label= Comma-sep. list of queries: 'ALL' for all types of queries. 'None' for none. ALL, SQL (only sql() and sql_query() ), SELECT, UPDATE, INSERT, DELETE
+  # cat=basic/conf; type=text; label= Comma-sep. list of queries: 'ALL' for all types of queries. 'None' for none. ALL, SQL (only sql() and sql_query() ), SELECT, UPDATE, INSERT, DELETE, ALTER
 QUERIES = ALL
   # cat=basic/conf; type=text; label= Comma-sep. list of tables: 'ALL' for all tables. 'None' for none. List of tables that generate debug-messages.
 TABLES = ALL

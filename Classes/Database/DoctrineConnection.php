@@ -20,7 +20,7 @@ use Psr\Log\LoggerAwareTrait;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\SQLParserUtils;
 use Exception;
@@ -45,6 +45,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     protected $fileWriterMode = 0;
     /** @var bool */
     protected $backTrace = false;
+    protected $typeArray = ['DELETE', 'UPDATE', 'INSERT', 'CREATE', 'DROP', 'ALTER', 'GRANT', 'REVOKE'];
 
     /**
      * Internal property to mark if a deprecation log warning has been thrown in this request
@@ -63,7 +64,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function __construct (array $params, Driver $driver, Configuration $config = null, EventManager $em = null)
+    public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $em = null)
     {
         parent::__construct($params, $driver, $config, $em);
         $extensionConfiguration =
@@ -102,29 +103,51 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         return true;
     }
 
-    public function determineTablename ($expandedQuery, $type) 
+    public function determineTablename($expandedQuery, $type) 
     {
         $result = 'table not found';
         $sqlSearchWord = '';
-        switch ($type) {
-            case 'UPDATE':
-                 $sqlSearchWord = 'UPDATE';
-            break;
-            case 'INSERT':
-                 $sqlSearchWord = 'INTO';
-            break;
-            default:
-                $sqlSearchWord = 'FROM';
-        }
+        if (
+            !empty($type) &&
+            stripos($expandedQuery, $type) !== false
+        ) {
+            switch ($type) {
+                case 'SELECT':
+                case 'DELETE':
+                    $sqlSearchWord = 'FROM';
+                    break;
 
-        if (strpos($expandedQuery, '`')) {
-            preg_match('/'. $sqlSearchWord . ' `(\w+)`/s' , $expandedQuery, $matches);
-        } else {
-            preg_match('/' . $sqlSearchWord . ' (\w+) /s' , $expandedQuery, $matches);
-        }
+                case 'INSERT':
+                    $sqlSearchWord = 'INTO';
+                    break;
 
-        if (is_array($matches) && isset($matches['1'])) {
-            $result = $matches['1'];
+                case 'CREATE':
+                case 'DROP':
+                case 'ALTER':
+                case 'GRANT':
+                case 'REVOKE':
+                    $sqlSearchWord = 'TABLE';
+                    break;
+                case 'SHOW':
+                    // nothing
+                    break;
+            }
+        }
+     
+        if (
+            $sqlSearchWord
+        ) {    
+            if (strpos($expandedQuery, $sqlSearchWord . ' `')) {
+                $search = '/'. $sqlSearchWord . '\s+`(\w*\.*\w+)`\s*/s';
+                preg_match($search , $expandedQuery, $matches);
+            } else {
+                $search = '/'. $sqlSearchWord . '\s+(\w*\.*\w+)\s*/s';
+                preg_match($search , $expandedQuery, $matches);
+            }
+
+            if (is_array($matches) && isset($matches['1'])) {
+                $result = $matches['1'];
+            }
         }
         return $result;
     }
@@ -144,32 +167,27 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws DBALException
      */
-    public function executeQuery ($query, array $params = [], $types = [], ?\Doctrine\DBAL\Cache\QueryCacheProfile $qcp = null)
+    public function executeQuery($query, array $params = [], $types = [], ?\Doctrine\DBAL\Cache\QueryCacheProfile $qcp = null)
     {
         $starttime = microtime(true);
         $stmt = null;
         $errorCode = 0;
-        $errorInfo = null;
+        $errorMessage = '';
+        $exception = false;
+        $throwException = null;
 
         try {
             $stmt = parent::executeQuery($query, $params, $types, $qcp);
         }
         catch (DBALException $e) {
-            throw $e;
-
             $errorCode = $e->getCode();
-            $errorInfo = $e->errorInfo();
+            $errorMessage = $e->getMessage();
+            $throwException = $e;
         }
         finally {
             $endtime = microtime(true);
 
-            if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
-                
-                if ($errorCode > 0) {
-                    $errorInfo = $errorInfo[0] . ' ' . $errorInfo[1] ?? '' . ' ' . $errorInfo[2] ?? '';
-                    $errorInfo = $errorCode . ':' . $errorInfo;
-                }
-
+            if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
                 $expandedQuery = 
                     $this->doctrineApi->getExpandedQuery(
                         $query,
@@ -181,14 +199,18 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
                 $affectedRows = '';
                 $microseconds = $endtime - $starttime;
-                $this->myDebug($myName, $errorInfo, 'SELECT', $table, $expandedQuery, $stmt, $affectedRows, $microseconds);
+                $this->myDebug($myName, $errorMessage, 'SELECT', $table, $expandedQuery, $stmt, $affectedRows, $microseconds);
             }
 
             if ($this->debugOutput) {
-                $this->debug('executeQuery', $errorCode, $errorInfo, $query);
+                $this->debug('executeQuery', $errorCode, $errorMessage, $query);
+            }
+
+            if (is_object($throwException)) {
+                throw $throwException;
             }
         }
-    
+
         return $stmt;
     }
 
@@ -206,34 +228,27 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws DBALException
      */
-    public function executeUpdate ($query, array $params = [], array $types = [])
+    public function executeUpdate($query, array $params = [], array $types = [])
     {
         $myName = 'executeUpdate';
         $starttime = microtime(true);
         $errorCode = 0;
-        $errorInfo = null;
         $errorMessage = '';
         $affectedRows = '';
+        $throwException = null;
 
         try {
             $affectedRows = parent::executeUpdate($query, $params, $types);
         }
         catch (DBALException $e) {
-            throw $e;
-
             $errorCode = $e->getCode();
-            $errorInfo = $e->errorInfo();
             $errorMessage = $e->getMessage();
+            $throwException = $e;
         }
         finally {
             $endtime = microtime(true);
 
-            if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
-                if ($errorCode > 0) {
-                    $errorInfo = $errorInfo[0] . ' ' . $errorInfo[1] ?? '' . ' ' . $errorInfo[2] ?? '';
-                    $errorInfo = $errorCode . ':' . $errorInfo . ':' . $errorMessage;
-                }
-
+            if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
                 $expandedQuery = 
                     $this->doctrineApi->getExpandedQuery(
                         $query,
@@ -242,23 +257,98 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     );
 
                 $type = '';
-                $typeArray = ['DELETE', 'UPDATE', 'INSERT'];
-                foreach ($typeArray as $type) {
+                foreach ($this->typeArray as $type) {
                     if (substr($query, 0, strlen($type)) == $type) {
                         break;
                     }
                 }
                 $table = $this->determineTablename($expandedQuery, $type);
-                $this->myDebug($myName, $errorInfo, $type, $table, $expandedQuery, null, $affectedRows, $endtime - $starttime);
+                $this->myDebug($myName, $errorMessage, $type, $table, $expandedQuery, null, $affectedRows, $endtime - $starttime);
+            }
+            if ($this->debugOutput) {
+                $this->debug($myName, $errorCode, $errorMessage, $query);
+            }
+
+            if (is_object($throwException)) {
+                throw $throwException;
             }
         }
     
-        if ($this->debugOutput) {
-            $this->debug($myName, $errorCode, $errorInfo, $query);
-        }
-
         return $affectedRows;
     }
+
+    
+    /**
+     * Executes an SQL statement with the given parameters and returns the number of affected rows.
+     *
+     * Could be used for:
+     *  - DML statements: INSERT, UPDATE, DELETE, etc.
+     *  - DDL statements: CREATE, DROP, ALTER, etc.
+     *  - DCL statements: GRANT, REVOKE, etc.
+     *  - Session control statements: ALTER SESSION, SET, DECLARE, etc.
+     *  - Other statements that don't yield a row set.
+     *
+     * This method supports PDO binding types as well as DBAL mapping types.
+     *
+     * @param string                                                               $sql    SQL statement
+     * @param array<int, mixed>|array<string, mixed>                               $params Statement parameters
+     * @param array<int, int|string|Type|null>|array<string, int|string|Type|null> $types  Parameter types
+     *
+     * @return int|string The number of affected rows.
+     *
+     * @throws Exception
+     */
+    public function executeStatement($sql, array $params = [], array $types = [])
+    {
+        $myName = 'executeStatement';
+        $starttime = microtime(true);
+        $errorCode = 0;
+        $errorMessage = '';
+        $affectedRows = '';
+        $throwException = null;
+    
+        $type = '';
+        foreach ($this->typeArray as $type) {
+            if (substr($sql, 0, strlen($type)) == $type) {
+                break;
+            }
+        }
+            
+        try {
+            $affectedRows = parent::executeStatement($sql, $params, $types);
+        }
+        catch (DBALException $e) {
+            $errorCode = $e->getCode();
+            $errorMessage = $e->getMessage();
+            $throwException = $e;
+        }
+        finally {
+            $endtime = microtime(true);
+
+            if (
+                $this->bDisplayOutput($errorMessage, $starttime, $endtime)
+            ) {
+                $expandedSql = 
+                    $this->doctrineApi->getExpandedQuery(
+                        $sql,
+                        $params,
+                        $types
+                    );
+                $table = $this->determineTablename($expandedSql, $type);
+                $this->myDebug($myName, $errorMessage, $type, $table, $expandedSql, null, $affectedRows, $endtime - $starttime);
+            }
+            if ($this->debugOutput) {
+                $this->debug($myName, $errorCode, $errorMessage, $sql);
+            }
+
+            if (is_object($throwException)) {
+                throw $throwException;
+            }
+        }
+    
+        return $affectedRows;
+    }
+
 
 
     /**
@@ -270,38 +360,40 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws DBALException
      */
-    public function exec ($statement)
+    public function exec($statement)
     {
         $myName = 'exec';
         $errorCode = 0;
-        $errorInfo = null;
+        $errorMessage = '';
         $starttime = microtime(true);
+        $throwException = null;
+
         try {
             $result = parent::exec($statement);
         } catch (Throwable $e) {
             if ($this->debugOutput) {
-                debug($e);
                 $errorCode = $e->getCode();
-                $errorInfo = $e->errorInfo();
+                $errorMessage = $e->getMessage();
             }
+            $throwException = $e;
         }
         finally {
             $endtime = microtime(true);
-        }
 
-        if ($this->bDisplayOutput($errorCode, $starttime, $endtime)) {
-            if ($errorCode > 0) {
-                $errorInfo = $errorInfo[0] . ' ' . $errorInfo[1] ?? '' . ' ' . $errorInfo[2] ?? '';
-                $errorInfo = $errorCode . ':' . $errorInfo;
+            if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
+                // TODO:
+                $table = 'exec Test- Tabelle';
+                $query = 'exec Test- Query';
+                $this->myDebug($myName, $errorMessage, 'SQL', $table, $query, $result, '', $endtime - $starttime);
             }
-            // TODO:
-            $table = 'exec Test- Tabelle';
-            $query = 'exec Test- Query';
-            $this->myDebug($myName, $errorInfo, 'SQL', $table, $query, $result, '', $endtime - $starttime);
-        }
-    
-        if ($this->debugOutput) {
-            $this->debug($myName, $errorCode, $errorInfo, $statement);
+        
+            if ($this->debugOutput) {
+                $this->debug($myName, $errorCode, $errorMessage, $statement);
+            }
+
+            if (is_object($throwException)) {
+                throw $throwException;
+            }
         }
 
         return $result;
@@ -315,10 +407,10 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     * @param	float		endime of mysql-command
     * @return	boolean		true if output should be displayed
     */
-    public function bDisplayOutput ($error, $starttime, $endtime)
+    public function bDisplayOutput($errorMessage, $starttime, $endtime)
     {
         if (
-            $error != '' ||
+            $errorMessage != '' ||
             $this->ticker == '' ||
             $this->ticker <= $endtime - $starttime
         ) {
@@ -340,13 +432,13 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @param string $func Function calling debug()
      * @param string $query Last query if not last built query
      */
-    public function debug ($func, $errorCode = 0, $errorInfo = [], $query = '')
+    public function debug($func, $errorCode = 0, $errorMessage = '', $query = '')
     {
         if ($errorCode > 0) {
             $errorDebug = 
                 [
                     'caller' => \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection::class . '::' . $func,
-                    'ERROR' => $errorCode . ':' . $errorInfo,
+                    'ERROR' => $errorCode . ':' . $errorMessage,
                     'lastBuiltQuery' => $query,
                     'debug_backtrace' => \TYPO3\CMS\Core\Utility\DebugUtility::debugTrail()
                 ];
@@ -384,7 +476,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $affectedRows, $microseconds)
+    public function myDebug($func, $errorMessage, $mode, $table, $query, $resultSet, $affectedRows, $microseconds)
     {
         $insertId = '';
         if (
@@ -399,7 +491,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             $insertId = $this->lastInsertId($table);
         }
 
-        $this->debugApi->myDebug($this, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds);
+        $this->debugApi->myDebug($this, $func, $errorMessage, $mode, $table, $query, $affectedRows, $insertId, $microseconds);
     }
 }
 
