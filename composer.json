@@ -26,7 +26,7 @@
     "typo3/cms-core": "^11.5 || ^12.4"
   },
   "suggest": {
-    "friendsoftypo3/typo3db-legacy": "^1.0",
+    "friendsoftypo3/typo3db-legacy": "^1.1",
     "jambagecom/fh-debug": "^0.12"
   },
   "autoload": {

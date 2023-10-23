@@ -47,6 +47,9 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
         'cache_treelist',
         'fe_sessions'
     ];
+    protected $id = '0';
+    protected $feUid = 0;
+
 
     public function __construct ($debugConf)
     {
@@ -126,6 +129,19 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
         for ($i = 0; $i < $count; $i++) if (intval($tmp[$i])) {
             $this->dbgFeUser[intval($tmp[$i]) . '.'] = 1;
         }
+
+        if (
+            isset($GLOBALS['TSFE']) &&
+            is_object($GLOBALS['TSFE'])
+        ) {
+            $this->id = $GLOBALS['TSFE']->determineId();
+
+            if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
+                if (is_array($GLOBALS['TSFE']->fe_user->user)) {
+                    $this->feUid = intval($GLOBALS['TSFE']->fe_user->user['uid']);
+                }
+            }
+        }
     }
 
     public function debugTrail ($prependFileNames = false)
@@ -157,29 +173,13 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     */
     public function myDebug ($pObj, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds)
     {
-        $id = '0';
-        $feUid = 0;
-
-        if (
-            isset($GLOBALS['TSFE']) &&
-            is_object($GLOBALS['TSFE'])
-        ) {
-            $id = $GLOBALS['TSFE']->determineId();
-
-            if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
-                if (is_array($GLOBALS['TSFE']->fe_user->user)) {
-                    $feUid = intval($GLOBALS['TSFE']->fe_user->user['uid']);
-                }
-            }
-        }
-
         if ($table != '') {
             $sqlPart = $table;
         } else {
             $sqlPart = $query;
         }
 
-        $debugArray = ['function/mode'=>'Pg' . $id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
+        $debugArray = ['function/mode'=>'Pg' . $this->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
 
         if ($error) {
             if (!intval($this->dbgConf['DISABLE_ERRORS'])) {
@@ -248,11 +248,11 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
                 ) &&
                 (
                     count($this->dbgFeUser) == 0 ||
-                    !empty($this->dbgFeUser[$feUid . '.'])
+                    !empty($this->dbgFeUser[$this->feUid . '.'])
                 ) &&
                 (
-                    isset($this->dbgId[$id . '.']) &&
-                    $this->dbgId[$id . '.'] ||
+                    isset($this->dbgId[$this->id . '.']) &&
+                    $this->dbgId[$this->id . '.'] ||
                     isset($this->dbgId['0.']) &&
                     $this->dbgId['0.']
                 )
