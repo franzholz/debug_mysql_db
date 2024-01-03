@@ -389,7 +389,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
         $count = false;
         $resultSet = $this->exec_SELECTquery('COUNT(' . $field . ')', $table, $where, '', '', '', ['name' => 'exec_SELECTcountRows']);
         if ($resultSet !== false) {
-            list($count) = $this->sql_fetch_row($resultSet);
+            [$count] = $this->sql_fetch_row($resultSet);
             $count = (int) $count;
             $this->sql_free_result($resultSet);
         }
