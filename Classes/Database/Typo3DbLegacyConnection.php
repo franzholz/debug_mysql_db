@@ -524,8 +524,8 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
             $affectedRowsCount &&
             $this->getDatabaseHandle()::class == 'mysqli' &&
             $table != '' &&
-            !str_contains($table, '_mm') &&
-            !str_contains($table, 'cache') &&
+            !str_contains((string) $table, '_mm') &&
+            !str_contains((string) $table, 'cache') &&
             isset($GLOBALS['TCA'][$table]) // Check if the uid field is present. Any TCA table must have it.
         ) {
             $sqlInsertId = 0;

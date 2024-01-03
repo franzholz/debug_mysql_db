@@ -24,12 +24,12 @@ class DoctrineApi implements SingletonInterface {
     public function getExpandedQuery ($query, $params, $types)
     {
         $questionmarkMode = 
-            strpos($query, '(?') || 
-            strpos($query, '= ?');
+            strpos((string) $query, '(?') || 
+            strpos((string) $query, '= ?');
         $parts = []; 
         $partsIndex = 0;
         if ($questionmarkMode) {
-            $parts = explode('?', $query);
+            $parts = explode('?', (string) $query);
         }
         $expandedQuery = $query;
         foreach ($params as $paramName => $value) {
@@ -76,7 +76,7 @@ class DoctrineApi implements SingletonInterface {
             if ($questionmarkMode) {
                 $parts[$partsIndex++] .= $value;
             } else {
-                $expandedQuery = str_replace(':' . $paramName, $value, $expandedQuery);
+                $expandedQuery = str_replace(':' . $paramName, $value, (string) $expandedQuery);
             }
         }
 

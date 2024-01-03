@@ -58,8 +58,8 @@ class DebugApi implements SingletonInterface {
         $this->dbgTable['all'] = 0;
 
         if (
-            strtoupper($this->dbgConf['QUERIES']) == 'ALL' ||
-            !trim($this->dbgConf['QUERIES'])
+            strtoupper((string) $this->dbgConf['QUERIES']) == 'ALL' ||
+            !trim((string) $this->dbgConf['QUERIES'])
         ) {
             $this->dbgQuery = [
                 'ALL' => 1,
@@ -88,8 +88,8 @@ class DebugApi implements SingletonInterface {
         }
 
         if (
-            strtoupper($this->dbgConf['TABLES']) == 'ALL' ||
-            !trim($this->dbgConf['TABLES'])
+            strtoupper((string) $this->dbgConf['TABLES']) == 'ALL' ||
+            !trim((string) $this->dbgConf['TABLES'])
         ) {
             $this->dbgTable['all'] = 1;
         } else {
@@ -326,11 +326,11 @@ class DebugApi implements SingletonInterface {
     {
         $bEnable = false;
         $bDisable = false;
-        if (str_contains($sqlpart, 'table not found')) {
+        if (str_contains((string) $sqlpart, 'table not found')) {
             $bEnable = true;
             return;
         }
-        $sqlpart = preg_replace('/[`"\'?*()]*(:dcValue[0-9]*)*/', '', $sqlpart);
+        $sqlpart = preg_replace('/[`"\'?*()]*(:dcValue[0-9]*)*/', '', (string) $sqlpart);
         $strtokString = ',=<> ';
         $x = strtok($sqlpart, $strtokString);
 
@@ -346,7 +346,7 @@ class DebugApi implements SingletonInterface {
 
     public function enableByTable ($tablePart, $bErrorCase, &$bEnable, &$bDisable)
     {
-        $tablePart = trim ($tablePart);
+        $tablePart = trim ((string) $tablePart);
 
         if (strlen($tablePart) > 1) {
             $partArray = explode('.', $tablePart);

@@ -115,7 +115,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $sqlSearchWord = '';
         if (
             !empty($type) &&
-            stripos($expandedQuery, (string) $type) !== false
+            stripos((string) $expandedQuery, (string) $type) !== false
         ) {
             switch ($type) {
                 case 'SELECT':
@@ -143,12 +143,12 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if (
             $sqlSearchWord
         ) {    
-            if (strpos($expandedQuery, $sqlSearchWord . ' `')) {
+            if (strpos((string) $expandedQuery, $sqlSearchWord . ' `')) {
                 $search = '/'. $sqlSearchWord . '\s+`(\w*\.*\w+)`\s*/s';
-                preg_match($search , $expandedQuery, $matches);
+                preg_match($search , (string) $expandedQuery, $matches);
             } else {
                 $search = '/'. $sqlSearchWord . '\s+(\w*\.*\w+)\s*/s';
-                preg_match($search , $expandedQuery, $matches);
+                preg_match($search , (string) $expandedQuery, $matches);
             }
 
             if (is_array($matches) && isset($matches['1'])) {
@@ -264,7 +264,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
                 $type = '';
                 foreach ($this->typeArray as $type) {
-                    if (str_starts_with($query, $type)) {
+                    if (str_starts_with($query, (string) $type)) {
                         break;
                     }
                 }
@@ -315,7 +315,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     
         $type = '';
         foreach ($this->typeArray as $type) {
-            if (str_starts_with($sql, $type)) {
+            if (str_starts_with($sql, (string) $type)) {
                 break;
             }
         }

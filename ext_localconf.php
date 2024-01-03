@@ -38,9 +38,9 @@ call_user_func(function () {
         $databaseHost = $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['host'] ?? '';
         if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['port'])) {
             $databaseConnection->setDatabasePort($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['port']);
-        } elseif (strpos($databaseHost, ':') > 0) {
+        } elseif (strpos((string) $databaseHost, ':') > 0) {
             // @TODO: Find a way to handle this case in the install tool and drop this
-            [$databaseHost, $databasePort] = explode(':', $databaseHost);
+            [$databaseHost, $databasePort] = explode(':', (string) $databaseHost);
             $databaseConnection->setDatabasePort($databasePort);
         }
 
@@ -72,7 +72,7 @@ call_user_func(function () {
                 str_replace(
                     '\' . LF . \'',
                     LF,
-                    $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['initCommands']
+                    (string) $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['initCommands']
                 ),
                 true
             );
