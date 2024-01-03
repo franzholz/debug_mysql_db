@@ -47,7 +47,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
     /**
      * Initialize the database connection
      */
-    public function initialize ()
+    public function initialize (): void
     {
         $extensionConfiguration =
             GeneralUtility::makeInstance(
@@ -567,7 +567,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds)
+    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds): void
     {
         $affectedRows = '';
         $insertId = 0;

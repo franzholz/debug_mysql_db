@@ -438,7 +438,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @param string $func Function calling debug()
      * @param string $query Last query if not last built query
      */
-    public function debug($func, $errorCode = 0, $errorMessage = '', $query = '')
+    public function debug($func, $errorCode = 0, $errorMessage = '', $query = ''): void
     {
         if ($errorCode > 0) {
             $errorDebug = 
@@ -482,7 +482,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug($func, $errorMessage, $mode, $table, $query, $resultSet, $affectedRows, $microseconds)
+    public function myDebug($func, $errorMessage, $mode, $table, $query, $resultSet, $affectedRows, $microseconds): void
     {
         $insertId = '';
         if (

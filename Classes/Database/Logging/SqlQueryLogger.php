@@ -68,7 +68,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterf
     /**
      * {@inheritdoc}
      */
-    public function startQuery($sql, ?array $params = null, ?array $types = null)
+    public function startQuery($sql, ?array $params = null, ?array $types = null): void
     {
         if (! $this->enabled) {
             return;
@@ -86,7 +86,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterf
     /**
      * {@inheritdoc}
      */
-    public function stopQuery()
+    public function stopQuery(): void
     {
         if (! $this->enabled) {
             return;

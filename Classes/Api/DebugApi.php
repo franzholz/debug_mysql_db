@@ -169,7 +169,7 @@ class DebugApi implements SingletonInterface {
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($pObj, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds)
+    public function myDebug ($pObj, $func, $error, $mode, $table, $query, $affectedRows, $insertId, $microseconds): void
     {
         if ($table != '') {
             $sqlPart = $table;
@@ -285,7 +285,7 @@ class DebugApi implements SingletonInterface {
         }
     }
 
-    public function callDebugger ($debugFunc, $debugOut, $error = false)
+    public function callDebugger ($debugFunc, $debugOut, $error = false): void
     {
         try {
             if (
@@ -322,7 +322,7 @@ class DebugApi implements SingletonInterface {
     * @param	boolean		output: table is disabled
     * @return	void
     */
-    public function getEnableDisable ($sqlpart, $bErrorCase, &$bEnable, &$bDisable)
+    public function getEnableDisable ($sqlpart, $bErrorCase, &$bEnable, &$bDisable): void
     {
         $bEnable = false;
         $bDisable = false;
@@ -344,7 +344,7 @@ class DebugApi implements SingletonInterface {
         }
     }
 
-    public function enableByTable ($tablePart, $bErrorCase, &$bEnable, &$bDisable)
+    public function enableByTable ($tablePart, $bErrorCase, &$bEnable, &$bDisable): void
     {
         $tablePart = trim ((string) $tablePart);
 

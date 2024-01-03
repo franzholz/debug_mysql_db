@@ -46,7 +46,7 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
     /**
      * Initialize the database connection
      */
-    public function initialize ()
+    public function initialize (): void
     {
         $extensionConfiguration =
             GeneralUtility::makeInstance(
@@ -567,7 +567,7 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds)
+    public function myDebug ($func, $error, $mode, $table, $query, $resultSet, $microseconds): void
     {
         $affectedRows = '';
         $insertId = 0;

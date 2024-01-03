@@ -33,7 +33,7 @@ class FileWriter extends \TYPO3\CMS\Core\Log\Writer\FileWriter
     /** @var int */
     protected $mode;
 
-    public function setMode ($param) {
+    public function setMode ($param): void {
         $this->mode = $param;
     }
 
@@ -48,7 +48,7 @@ class FileWriter extends \TYPO3\CMS\Core\Log\Writer\FileWriter
      * @return WriterInterface $this
      * @throws \RuntimeException
      */
-    public function writeLog (LogRecord $record)
+    public function writeLog (LogRecord $record): void
     {
         $mode = $this->getMode();
         if ($mode == 1 || $mode == 3) {
