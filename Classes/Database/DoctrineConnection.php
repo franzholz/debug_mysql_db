@@ -115,7 +115,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $sqlSearchWord = '';
         if (
             !empty($type) &&
-            stripos($expandedQuery, $type) !== false
+            stripos($expandedQuery, (string) $type) !== false
         ) {
             switch ($type) {
                 case 'SELECT':
