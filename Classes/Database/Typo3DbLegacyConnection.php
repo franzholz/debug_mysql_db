@@ -449,7 +449,7 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
         $starttime = microtime(true);
         $resultSet = $this->query($query);
         $endtime = microtime(true);
-        if (strpos($query, 'SESSION') === false) {
+        if (!str_contains($query, 'SESSION')) {
             $error = $this->sql_error();
             if ($this->bDisplayOutput($error, $starttime, $endtime)) {
                 $myName = 'TYPO3_DB->sql_query';
@@ -522,10 +522,10 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
         if (
             !$result &&
             $affectedRowsCount &&
-            get_class($this->getDatabaseHandle()) == 'mysqli' &&
+            $this->getDatabaseHandle()::class == 'mysqli' &&
             $table != '' &&
-            strpos($table, '_mm') === false &&
-            strpos($table, 'cache') === false &&
+            !str_contains($table, '_mm') &&
+            !str_contains($table, 'cache') &&
             isset($GLOBALS['TCA'][$table]) // Check if the uid field is present. Any TCA table must have it.
         ) {
             $sqlInsertId = 0;

@@ -35,7 +35,6 @@ use Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection;
 * @subpackage debug_mysql_db
 */
 class DebugApi implements SingletonInterface {
-    protected $dbgConf = [];
     protected $dbgQuery = [];
     protected $dbgTable = [];
     protected $dbgExcludeTable = [];
@@ -51,9 +50,8 @@ class DebugApi implements SingletonInterface {
     protected $feUid = 0;
 
 
-    public function __construct ($debugConf)
+    public function __construct (protected $dbgConf)
     {
-        $this->dbgConf = $debugConf;
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ?: '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
         $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ?: false;
         $this->dbgTca = $this->dbgConf['TCA'] ?: false;
@@ -310,7 +308,7 @@ class DebugApi implements SingletonInterface {
                 DebugUtility::debug($debugOut);
             }
         }
-        catch(Exception $e) {
+        catch(Exception) {
             DebugUtility::debug($debugOut);
         }
     }
@@ -328,7 +326,7 @@ class DebugApi implements SingletonInterface {
     {
         $bEnable = false;
         $bDisable = false;
-        if (strpos($sqlpart, 'table not found') !== false) {
+        if (str_contains($sqlpart, 'table not found')) {
             $bEnable = true;
             return;
         }

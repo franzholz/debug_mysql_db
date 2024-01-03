@@ -57,16 +57,12 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterf
 
     protected $doctrineApi;
 
-    /** @var int */
-    protected $fileWriterMode;
-
-    /** @var bool */
-    protected $backTrace;
-
-    public function __construct($fileWriterMode, $backTrace) {
+    /**
+     * @param int $fileWriterMode
+     * @param bool $backTrace
+     */
+    public function __construct(protected $fileWriterMode, protected $backTrace) {
         $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
-        $this->fileWriterMode = $fileWriterMode;
-        $this->backTrace = $backTrace;
     }
 
     /**

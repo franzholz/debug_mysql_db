@@ -264,7 +264,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
 
                 $type = '';
                 foreach ($this->typeArray as $type) {
-                    if (substr($query, 0, strlen($type)) == $type) {
+                    if (str_starts_with($query, $type)) {
                         break;
                     }
                 }
@@ -315,7 +315,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     
         $type = '';
         foreach ($this->typeArray as $type) {
-            if (substr($sql, 0, strlen($type)) == $type) {
+            if (str_starts_with($sql, $type)) {
                 break;
             }
         }
