@@ -83,7 +83,7 @@ call_user_func(function () {
         $GLOBALS['TYPO3_DB']->initialize();
     }
 
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\Connection'] = [
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Database\Connection::class] = [
         'className' => \Geithware\DebugMysqlDb\Database\DoctrineConnection::class
     ];
     

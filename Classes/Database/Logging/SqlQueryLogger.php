@@ -105,7 +105,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterf
 
         // Maybe no logger is instantiated in TYPO3 8.7 
         if (!($this->logger instanceof LoggerInterface)) {
-            $this->setLogger(GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__));    
+            $this->setLogger(GeneralUtility::makeInstance(LogManager::class)->getLogger(self::class));    
         }
 
         $paramString = null;
