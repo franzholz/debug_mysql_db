@@ -14,7 +14,10 @@ namespace Geithware\DebugMysqlDb\Database;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use Geithware\DebugMysqlDb\Api\DebugApi;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 
@@ -28,7 +31,7 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 * @package TYPO3
 * @subpackage debug_mysql_db
 */
-class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection implements \TYPO3\CMS\Core\SingletonInterface {
+class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInterface {
     protected $debugApi = null;
     public $debugOutput = false;
     protected $ticker = '';
@@ -46,13 +49,13 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
     public function initialize ()
     {
         $extensionConfiguration =
-            \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+            GeneralUtility::makeInstance(
+                ExtensionConfiguration::class
             )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 
-        $this->debugApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DebugApi::class, $extensionConfiguration);
+        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
     }
 
     /**
@@ -246,7 +249,7 @@ class Typo3DbLegacyConnection extends \TYPO3\CMS\Typo3DbLegacy\Database\Database
         $error = $this->sql_error();
 
         if ($this->bDisplayOutput($error, $starttime, $endtime)) {
-            $myName = is_array($dbgModes) ? ($dbgModes['name'] ? $dbgModes['name'] : __FILE__ . ':' . __LINE__ ) : 'exec_SELECTquery';
+            $myName = is_array($dbgModes) ? ($dbgModes['name'] ?: __FILE__ . ':' . __LINE__ ) : 'exec_SELECTquery';
             $this->myDebug($myName, $error, 'SELECT', $from_table, $query, $resultSet, $endtime - $starttime);
         }
         if ($this->debugOutput) {

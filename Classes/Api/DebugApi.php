@@ -14,7 +14,7 @@ namespace Geithware\DebugMysqlDb\Api;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -34,7 +34,7 @@ use Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection;
 * @package TYPO3
 * @subpackage debug_mysql_db
 */
-class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
+class DebugApi implements SingletonInterface {
     protected $dbgConf = [];
     protected $dbgQuery = [];
     protected $dbgTable = [];
@@ -54,9 +54,9 @@ class DebugApi implements \TYPO3\CMS\Core\SingletonInterface {
     public function __construct ($debugConf)
     {
         $this->dbgConf = $debugConf;
-        $this->dbgOutput = $this->dbgConf['OUTPUT'] ? $this->dbgConf['OUTPUT'] : '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
-        $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ? $this->dbgConf['TEXTFORMAT'] : false;
-        $this->dbgTca = $this->dbgConf['TCA'] ? $this->dbgConf['TCA'] : false;
+        $this->dbgOutput = $this->dbgConf['OUTPUT'] ?: '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
+        $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ?: false;
+        $this->dbgTca = $this->dbgConf['TCA'] ?: false;
         $this->dbgTable['all'] = 0;
 
         if (

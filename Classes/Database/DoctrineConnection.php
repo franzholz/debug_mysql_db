@@ -14,7 +14,13 @@ namespace Geithware\DebugMysqlDb\Database;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use Psr\Log\LoggerAwareInterface;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use Geithware\DebugMysqlDb\Api\DebugApi;
+use Geithware\DebugMysqlDb\Api\DoctrineApi;
+use Geithware\DebugMysqlDb\Database\Logging\SqlQueryLogger;
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 use Psr\Log\LoggerAwareTrait;
 
 use Doctrine\Common\EventManager;
@@ -34,7 +40,7 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 
 
 
-class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements \Psr\Log\LoggerAwareInterface {
+class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements LoggerAwareInterface {
     use LoggerAwareTrait;
 
     protected $debugApi = null;
@@ -68,8 +74,8 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     {
         parent::__construct($params, $driver, $config, $em);
         $extensionConfiguration =
-            \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+            GeneralUtility::makeInstance(
+                ExtensionConfiguration::class
             )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->debugUtilityErrors = (intval($extensionConfiguration['DEBUGUTILITY_ERRORS'])) ? true : false;
@@ -78,8 +84,8 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $this->fileWriterMode = $extensionConfiguration['FILEWRITER'] ? intval($extensionConfiguration['FILEWRITER']) : 0;
         $this->backTrace = (bool) $extensionConfiguration['BTRACE_SQL'];
 
-        $this->debugApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DebugApi::class, $extensionConfiguration);
-        $this->doctrineApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DoctrineApi::class);
+        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
+        $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
     }
 
     /**
@@ -95,7 +101,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         }
         $logger = 
             GeneralUtility::makeInstance(
-                Logging\SqlQueryLogger::class,
+                SqlQueryLogger::class,
                 $this->fileWriterMode,
                 $this->backTrace
             );
@@ -437,14 +443,14 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if ($errorCode > 0) {
             $errorDebug = 
                 [
-                    'caller' => \TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection::class . '::' . $func,
+                    'caller' => DatabaseConnection::class . '::' . $func,
                     'ERROR' => $errorCode . ':' . $errorMessage,
                     'lastBuiltQuery' => $query,
-                    'debug_backtrace' => \TYPO3\CMS\Core\Utility\DebugUtility::debugTrail()
+                    'debug_backtrace' => DebugUtility::debugTrail()
                 ];
 
             if ($this->debugUtilityErrors) {
-                \TYPO3\CMS\Core\Utility\DebugUtility::debug(
+                DebugUtility::debug(
                     $errorDebug,
                     $func,
                     isset($GLOBALS['error']) &&

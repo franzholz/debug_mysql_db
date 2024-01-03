@@ -14,11 +14,11 @@ namespace Geithware\DebugMysqlDb\Api;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use TYPO3\CMS\Core\SingletonInterface;
 use Doctrine\DBAL\Connection;
 
 
-class DoctrineApi implements \TYPO3\CMS\Core\SingletonInterface {
+class DoctrineApi implements SingletonInterface {
 
     // mit QueryBuilder Methode ergänzen
     public function getExpandedQuery ($query, $params, $types)

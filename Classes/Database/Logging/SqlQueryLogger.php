@@ -13,7 +13,11 @@ namespace Geithware\DebugMysqlDb\Database\Logging;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use TYPO3\CMS\Core\SingletonInterface;
+use Geithware\DebugMysqlDb\Api\DoctrineApi;
+use TYPO3\CMS\Core\Utility\DebugUtility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use Geithware\DebugMysqlDb\Api\DebugApi;
 use Doctrine\DBAL\Logging\SQLLogger;
 
 use Psr\Log\LoggerAwareInterface;
@@ -28,7 +32,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * This implements a Doctrine SQL Query Logger for TYPO3
  */
-class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core\SingletonInterface
+class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterface
 {
    use LoggerAwareTrait;
 
@@ -60,7 +64,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
     protected $backTrace;
 
     public function __construct($fileWriterMode, $backTrace) {
-        $this->doctrineApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DoctrineApi::class);
+        $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
         $this->fileWriterMode = $fileWriterMode;
         $this->backTrace = $backTrace;
     }
@@ -79,7 +83,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
         $this->queryCount += 1;
         $this->currentQuery = ['sql' => $sql, 'params' => $params, 'types' => $types, 'executionMS' => 0];
         if ($this->backTrace) {
-            $this->currentQuery['debug_backtrace'] = \TYPO3\CMS\Core\Utility\DebugUtility::debugTrail();
+            $this->currentQuery['debug_backtrace'] = DebugUtility::debugTrail();
         }
     }
 
@@ -94,10 +98,10 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, \TYPO3\CMS\Core
 
         $extensionConfiguration =
             GeneralUtility::makeInstance(
-                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+                ExtensionConfiguration::class
             )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
 
-        $debugApi = GeneralUtility::makeInstance(\Geithware\DebugMysqlDb\Api\DebugApi::class, $extensionConfiguration);
+        $debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
 
         // Maybe no logger is instantiated in TYPO3 8.7 
         if (!($this->logger instanceof LoggerInterface)) {
