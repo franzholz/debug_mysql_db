@@ -24,14 +24,14 @@ use TYPO3\CMS\Core\Utility\DebugUtility;
 use Psr\Log\LoggerAwareTrait;
 
 use Doctrine\Common\EventManager;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\SQLParserUtils;
 use Exception;
-
-
 
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -66,13 +66,19 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @param array $params The connection parameters.
      * @param Driver $driver The driver to use.
      * @param Configuration|null $config The configuration, optional.
-     * @param EventManager|null $em The event manager, optional.
+     * @param EventManager|null $eventManager The event manager, optional.
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $em = null)
+    public function __construct(
+        #[SensitiveParameter]
+        array $params,
+        Driver $driver,
+        ?Configuration $config = null,
+        ?EventManager $eventManager = null
+    )
     {
-        parent::__construct($params, $driver, $config, $em);
+        parent::__construct($params, $driver, $config, $eventManager);
         $extensionConfiguration =
             GeneralUtility::makeInstance(
                 ExtensionConfiguration::class
@@ -169,11 +175,16 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @param int[]|string[]         $types  The types the previous parameters are in.
      * @param QueryCacheProfile|null $qcp    The query cache profile, optional.
      *
-     * @return ResultStatement The executed statement.
+     * @return Result The executed statement.
      *
      * @throws DBALException
      */
-    public function executeQuery($query, array $params = [], $types = [], ?\Doctrine\DBAL\Cache\QueryCacheProfile $qcp = null)
+    public function executeQuery(
+        string $sql,
+        array $params = [],
+        $types = [],
+        ?QueryCacheProfile $qcp = null
+    ): Result
     {
         $starttime = microtime(true);
         $stmt = null;
@@ -183,7 +194,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $throwException = null;
 
         try {
-            $stmt = parent::executeQuery($query, $params, $types, $qcp);
+            $stmt = parent::executeQuery($sql, $params, $types, $qcp);
         }
         catch (DBALException $e) {
             $errorCode = $e->getCode();
@@ -196,7 +207,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
                 $expandedQuery = 
                     $this->doctrineApi->getExpandedQuery(
-                        $query,
+                        $sql,
                         $params,
                         $types
                     );
@@ -209,7 +220,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             }
 
             if ($this->debugOutput) {
-                $this->debug('executeQuery', $errorCode, $errorMessage, $query);
+                $this->debug('executeQuery', $errorCode, $errorMessage, $sql);
             }
 
             if (is_object($throwException)) {
@@ -234,7 +245,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws DBALException
      */
-    public function executeUpdate($query, array $params = [], array $types = [])
+    public function executeUpdate(string $sql, array $params = [], array $types = []): int
     {
         $myName = 'executeUpdate';
         $starttime = microtime(true);
@@ -244,7 +255,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $throwException = null;
 
         try {
-            $affectedRows = parent::executeUpdate($query, $params, $types);
+            $affectedRows = parent::executeUpdate($sql, $params, $types);
         }
         catch (DBALException $e) {
             $errorCode = $e->getCode();
@@ -257,14 +268,14 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
                 $expandedQuery = 
                     $this->doctrineApi->getExpandedQuery(
-                        $query,
+                        $sql,
                         $params,
                         $types
                     );
 
                 $type = '';
                 foreach ($this->typeArray as $type) {
-                    if (str_starts_with($query, (string) $type)) {
+                    if (str_starts_with($sql, (string) $type)) {
                         break;
                     }
                 }
@@ -272,7 +283,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 $this->myDebug($myName, $errorMessage, $type, $table, $expandedQuery, null, $affectedRows, $endtime - $starttime);
             }
             if ($this->debugOutput) {
-                $this->debug($myName, $errorCode, $errorMessage, $query);
+                $this->debug($myName, $errorCode, $errorMessage, $sql);
             }
 
             if (is_object($throwException)) {
@@ -366,7 +377,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws DBALException
      */
-    public function exec($statement)
+    public function exec(string $statement): int
     {
         $myName = 'exec';
         $errorCode = 0;
@@ -389,8 +400,8 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
                 // TODO:
                 $table = 'exec Test- Tabelle';
-                $query = 'exec Test- Query';
-                $this->myDebug($myName, $errorMessage, 'SQL', $table, $query, $result, '', $endtime - $starttime);
+                $sql = 'exec Test- Query';
+                $this->myDebug($myName, $errorMessage, 'SQL', $table, $sql, $result, '', $endtime - $starttime);
             }
         
             if ($this->debugOutput) {
