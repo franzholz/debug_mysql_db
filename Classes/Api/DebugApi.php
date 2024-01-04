@@ -36,11 +36,12 @@ use Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection;
 */
 class DebugApi implements SingletonInterface {
     protected $dbgQuery = [];
-    protected $dbgTable = [];
     protected $dbgExcludeTable = [];
     protected $dbgId = [];
     protected $dbgFeUser = [];
     protected $dbgOutput = '';
+    protected $dbgTable = [];
+    protected $dbgTca = false;
     protected $dbgTextformat = false;
     protected $typo3Tables = [
         'cache_treelist',
