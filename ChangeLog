@@ -1,5 +1,8 @@
+2024-01-31 Franz Holzinger  <franz@ttproducts.de>
+    * Show SQL queries after all throwable exceptions.
+
 2024-01-04 Franz Holzinger  <franz@ttproducts.de>
-	* fix function declaration compatibility between DoctrineConnection and \TYPO3\CMS\Core\Database\Connection
+  	* fix function declaration compatibility between DoctrineConnection and \TYPO3\CMS\Core\Database\Connection
 
 2024-01-03 Franz Holzinger  <franz@ttproducts.de>
 	* use rector to improve the PHP code

@@ -177,7 +177,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @return Result The executed statement.
      *
-     * @throws DBALException
+     * @throws Exception
      */
     public function executeQuery(
         string $sql,
@@ -196,7 +196,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         try {
             $stmt = parent::executeQuery($sql, $params, $types, $qcp);
         }
-        catch (DBALException $e) {
+        catch (Throwable $e) {
             $errorCode = $e->getCode();
             $errorMessage = $e->getMessage();
             $throwException = $e;
@@ -243,7 +243,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @return int The number of affected rows.
      *
-     * @throws DBALException
+     * @throws Exception
      */
     public function executeUpdate(string $sql, array $params = [], array $types = []): int
     {
@@ -257,7 +257,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         try {
             $affectedRows = parent::executeUpdate($sql, $params, $types);
         }
-        catch (DBALException $e) {
+        catch (Throwable $e) {
             $errorCode = $e->getCode();
             $errorMessage = $e->getMessage();
             $throwException = $e;
@@ -334,7 +334,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         try {
             $affectedRows = parent::executeStatement($sql, $params, $types);
         }
-        catch (DBALException $e) {
+        catch (Throwable $e) {
             $errorCode = $e->getCode();
             $errorMessage = $e->getMessage();
             $throwException = $e;
@@ -375,7 +375,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @return int The number of affected rows.
      *
-     * @throws DBALException
+     * @throws Exception
      */
     public function exec(string $statement): int
     {

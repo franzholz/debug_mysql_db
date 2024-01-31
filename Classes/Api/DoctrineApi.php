@@ -18,6 +18,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use Doctrine\DBAL\Connection;
 
 
+
 class DoctrineApi implements SingletonInterface {
 
     // mit QueryBuilder Methode ergänzen
@@ -32,6 +33,7 @@ class DoctrineApi implements SingletonInterface {
             $parts = explode('?', (string) $query);
         }
         $expandedQuery = $query;
+
         foreach ($params as $paramName => $value) {
             if (
                 is_array($types) &&
@@ -69,7 +71,10 @@ class DoctrineApi implements SingletonInterface {
                     $value = intval($value);
                     break;
                 case \TYPO3\CMS\Core\Database\Connection::PARAM_STR:
-                    $value = '\'' . $value . '\'';
+                    if (is_array($value)) {
+                        $value = current($value);
+                    }
+                    $value = '\'' . (string) $value . '\'';
                     break;
             }
 
