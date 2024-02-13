@@ -1,3 +1,6 @@
+2024-02-13 Franz Holzinger  <franz@ttproducts.de>
+    * move initialization into the middleware
+
 2024-01-31 Franz Holzinger  <franz@ttproducts.de>
     * Show SQL queries after all throwable exceptions.
 

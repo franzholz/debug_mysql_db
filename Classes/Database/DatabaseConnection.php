@@ -14,11 +14,15 @@ namespace Geithware\DebugMysqlDb\Database;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use Psr\Http\Message\ServerRequestInterface;
+
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use Geithware\DebugMysqlDb\Api\DebugApi;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 
 
 /**
@@ -44,10 +48,20 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
      */
     protected $deprecationWarningThrown = true;
 
+    protected ?ServerRequestInterface $request = null;
+
+    /**
+     * Pre-Initialize the database connection
+     */
+    public function preInitialize(ServerRequestInterface $request): void
+    {
+        $this->request = $request;
+    }
+
     /**
      * Initialize the database connection
      */
-    public function initialize (): void
+    public function initialize(): void
     {
         $extensionConfiguration =
             GeneralUtility::makeInstance(
@@ -56,7 +70,12 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 
-        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
+        $this->debugApi =
+            GeneralUtility::makeInstance(
+                DebugApi::class, 
+                $this->request, 
+                $extensionConfiguration
+            );
     }
 
     /**

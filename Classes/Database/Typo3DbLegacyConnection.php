@@ -14,6 +14,9 @@ namespace Geithware\DebugMysqlDb\Database;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use Psr\Http\Message\ServerRequestInterface;
+
 use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -35,6 +38,7 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
     protected $debugApi = null;
     public $debugOutput = false;
     protected $ticker = '';
+    protected ?ServerRequestInterface $request = null;
 
     /**
      * Internal property to mark if a deprecation log warning has been thrown in this request
@@ -44,9 +48,17 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
     protected $deprecationWarningThrown = true;
 
     /**
+     * Pre-Initialize the database connection
+     */
+    public function preInitialize(ServerRequestInterface $request): void
+    {
+        $this->request = $request;
+    }
+
+    /**
      * Initialize the database connection
      */
-    public function initialize (): void
+    public function initialize(): void
     {
         $extensionConfiguration =
             GeneralUtility::makeInstance(
@@ -55,7 +67,11 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 
-        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
+        $this->debugApi = GeneralUtility::makeInstance(
+            DebugApi::class,
+            $this->request,
+            $extensionConfiguration
+        );
     }
 
     /**

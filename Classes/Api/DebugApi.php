@@ -14,6 +14,9 @@ namespace Geithware\DebugMysqlDb\Api;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use Psr\Http\Message\ServerRequestInterface;
+
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -51,7 +54,7 @@ class DebugApi implements SingletonInterface {
     protected $feUid = 0;
 
 
-    public function __construct (protected $dbgConf)
+    public function __construct (ServerRequestInterface $request, protected $dbgConf)
     {
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ?: '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
         $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ?: false;
@@ -133,7 +136,7 @@ class DebugApi implements SingletonInterface {
             isset($GLOBALS['TSFE']) &&
             is_object($GLOBALS['TSFE'])
         ) {
-            $this->id = $GLOBALS['TSFE']->determineId();
+            $this->id = $GLOBALS['TSFE']->determineId($request);
 
             if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
                 if (is_array($GLOBALS['TSFE']->fe_user->user)) {
@@ -287,7 +290,7 @@ class DebugApi implements SingletonInterface {
     }
 
     public function callDebugger ($debugFunc, $debugOut, $error = false): void
-    {
+    {        
         try {
             if (
                 $debugFunc == 'debug' &&
