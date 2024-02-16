@@ -42,6 +42,9 @@ class BootstrapApi
     public function init(ServerRequestInterface $request, $requestEmpty = false): void
     {
         $extensionKey = 'debug_mysql_db';
+        if (!isset($GLOBALS['TYPO3_REQUEST'])) {
+                $GLOBALS['TYPO3_REQUEST'] = $request;
+        }
 
         $extensionConfiguration = GeneralUtility::makeInstance(
             \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class

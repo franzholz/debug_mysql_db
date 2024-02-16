@@ -13,6 +13,9 @@ namespace Geithware\DebugMysqlDb\Database\Logging;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use Psr\Http\Message\ServerRequestInterface;
+
 use TYPO3\CMS\Core\SingletonInterface;
 use Geithware\DebugMysqlDb\Api\DoctrineApi;
 use TYPO3\CMS\Core\Utility\DebugUtility;
@@ -65,6 +68,11 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterf
         $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
     }
 
+    private function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -97,7 +105,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterf
                 ExtensionConfiguration::class
             )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
 
-        $debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
+        $debugApi = GeneralUtility::makeInstance(DebugApi::class, $this->getRequest(), $extensionConfiguration);
 
         // Maybe no logger is instantiated in TYPO3 8.7 
         if (!($this->logger instanceof LoggerInterface)) {

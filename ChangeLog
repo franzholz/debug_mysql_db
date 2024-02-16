@@ -1,3 +1,6 @@
+2024-02-16 Franz Holzinger  <franz@ttproducts.de>
+    * use the global request object $GLOBALS['TYPO3_REQUEST']
+
 2024-02-13 Franz Holzinger  <franz@ttproducts.de>
     * move initialization into the middleware
 

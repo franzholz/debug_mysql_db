@@ -72,7 +72,7 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
 
         $this->debugApi =
             GeneralUtility::makeInstance(
-                DebugApi::class, 
+                DebugApi::class,
                 $this->request, 
                 $extensionConfiguration
             );
