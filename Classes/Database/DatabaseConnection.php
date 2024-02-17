@@ -15,8 +15,6 @@ namespace Geithware\DebugMysqlDb\Database;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use Geithware\DebugMysqlDb\Api\DebugApi;
@@ -48,16 +46,6 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
      */
     protected $deprecationWarningThrown = true;
 
-    protected ?ServerRequestInterface $request = null;
-
-    /**
-     * Pre-Initialize the database connection
-     */
-    public function preInitialize(ServerRequestInterface $request): void
-    {
-        $this->request = $request;
-    }
-
     /**
      * Initialize the database connection
      */
@@ -73,7 +61,6 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
         $this->debugApi =
             GeneralUtility::makeInstance(
                 DebugApi::class,
-                $this->request, 
                 $extensionConfiguration
             );
     }

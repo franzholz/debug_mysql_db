@@ -124,7 +124,6 @@ class BootstrapApi
             }
 
             $GLOBALS['TYPO3_DB'] = $databaseConnection;
-            $GLOBALS['TYPO3_DB']->preInitialize($request);
             $GLOBALS['TYPO3_DB']->initialize();
         }
         

@@ -48,14 +48,6 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
     protected $deprecationWarningThrown = true;
 
     /**
-     * Pre-Initialize the database connection
-     */
-    public function preInitialize(ServerRequestInterface $request): void
-    {
-        $this->request = $request;
-    }
-
-    /**
      * Initialize the database connection
      */
     public function initialize(): void
@@ -69,7 +61,6 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
 
         $this->debugApi = GeneralUtility::makeInstance(
             DebugApi::class,
-            $this->request,
             $extensionConfiguration
         );
     }

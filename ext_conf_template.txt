@@ -1,7 +1,7 @@
   # cat=main/conf; type=options[All=ALL,Front End=FE,Back End=BE,Off=OFF]; label=Typo3 Mode: Normaly set to FE to enable all FE-Plugins to generate debug output! Debugging is only enabled in this Mode.
 TYPO3_MODE = FE
   # cat=main/conf; type=text; label= Output: Destination of the debug info. possible Values: \TYPO3\CMS\Utility\DebugUtility::debug, debug, error_log (see TEXTFORMAT)
-OUTPUT = \TYPO3\CMS\Utility\DebugUtility::debug
+OUTPUT = debug
   # cat=basic/conf; type=boolean; label= Disable SQL errormessages: Normally all SQL errors that occur will be displayed. Set to 1 to disable.
 DISABLE_ERRORS = 0
   # cat=basic/conf; type=boolean; label= Use debug utility for errors: If set and an error occurs, all error messages are sent to \TYPO3\CMS\Core\Utility\DebugUtility::debug as well as to the debug method if available.

@@ -54,7 +54,7 @@ class DebugApi implements SingletonInterface {
     protected $feUid = 0;
 
 
-    public function __construct (ServerRequestInterface $request, protected $dbgConf)
+    public function __construct (protected $dbgConf)
     {
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ?: '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
         $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ?: false;
@@ -136,7 +136,6 @@ class DebugApi implements SingletonInterface {
             isset($GLOBALS['TSFE']) &&
             is_object($GLOBALS['TSFE'])
         ) {
-            $this->id = $GLOBALS['TSFE']->determineId($request);
 
             if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
                 if (is_array($GLOBALS['TSFE']->fe_user->user)) {
@@ -179,6 +178,16 @@ class DebugApi implements SingletonInterface {
             $sqlPart = $table;
         } else {
             $sqlPart = $query;
+        }
+
+        if (
+            isset($GLOBALS['TSFE']) &&
+            is_object($GLOBALS['TSFE'])
+        ) {
+            if (!isset($GLOBALS['TSFE']->id)) {
+                $GLOBALS['TSFE']->determineId($this->getRequest());
+            }
+            $this->id = $GLOBALS['TSFE']->id;
         }
 
         $debugArray = ['function/mode'=>'Pg' . $this->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
@@ -417,6 +426,11 @@ class DebugApi implements SingletonInterface {
             basename($debugTrail1['file']) . '#' . $debugTrail1['line'] . '->' . $debugTrail1['function'];
 
         return $result;
+    }
+    
+    private function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'];
     }
 }
 

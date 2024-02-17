@@ -105,7 +105,7 @@ class SqlQueryLogger implements SQLLogger, LoggerAwareInterface, SingletonInterf
                 ExtensionConfiguration::class
             )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
 
-        $debugApi = GeneralUtility::makeInstance(DebugApi::class, $this->getRequest(), $extensionConfiguration);
+        $debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
 
         // Maybe no logger is instantiated in TYPO3 8.7 
         if (!($this->logger instanceof LoggerInterface)) {
