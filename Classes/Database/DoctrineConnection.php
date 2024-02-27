@@ -61,6 +61,11 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @var bool
      */
     protected $deprecationWarningThrown = true;
+    
+    private function getRequest(): ServerRequestInterface
+    {
+        return $GLOBALS['TYPO3_REQUEST'];
+    }
 
     /**
      * Initializes a new instance of the Connection class.
@@ -92,7 +97,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $this->fileWriterMode = $extensionConfiguration['FILEWRITER'] ? intval($extensionConfiguration['FILEWRITER']) : 0;
         $this->backTrace = (bool) $extensionConfiguration['BTRACE_SQL'];
 
-        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class, $extensionConfiguration);
+        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class, $this->getRequest(), $extensionConfiguration);
         $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
     }
 
