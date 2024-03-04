@@ -55,7 +55,7 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
         $extensionConfiguration =
             GeneralUtility::makeInstance(
                 ExtensionConfiguration::class
-            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 

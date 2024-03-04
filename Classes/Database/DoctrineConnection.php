@@ -61,11 +61,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @var bool
      */
     protected $deprecationWarningThrown = true;
-    
-    private function getRequest(): ServerRequestInterface
-    {
-        return $GLOBALS['TYPO3_REQUEST'];
-    }
+
 
     /**
      * Initializes a new instance of the Connection class.
@@ -89,7 +85,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $extensionConfiguration =
             GeneralUtility::makeInstance(
                 ExtensionConfiguration::class
-            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->debugUtilityErrors = (intval($extensionConfiguration['DEBUGUTILITY_ERRORS'])) ? true : false;
 
@@ -97,7 +93,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $this->fileWriterMode = $extensionConfiguration['FILEWRITER'] ? intval($extensionConfiguration['FILEWRITER']) : 0;
         $this->backTrace = (bool) $extensionConfiguration['BTRACE_SQL'];
 
-        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class, $this->getRequest(), $extensionConfiguration);
+        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class,  $extensionConfiguration);
         $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
     }
 
@@ -112,7 +108,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if (!parent::connect()) {
             return false;
         }
-        $logger = 
+        $logger =
             GeneralUtility::makeInstance(
                 SqlQueryLogger::class,
                 $this->fileWriterMode,
@@ -122,7 +118,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         return true;
     }
 
-    public function determineTablename($expandedQuery, $type) 
+    public function determineTablename($expandedQuery, $type)
     {
         $result = 'table not found';
         $sqlSearchWord = '';
@@ -152,10 +148,10 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     break;
             }
         }
-     
+
         if (
             $sqlSearchWord
-        ) {    
+        ) {
             if (strpos((string) $expandedQuery, $sqlSearchWord . ' `')) {
                 $search = '/'. $sqlSearchWord . '\s+`(\w*\.*\w+)`\s*/s';
                 preg_match($search , (string) $expandedQuery, $matches);
@@ -212,7 +208,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             $endtime = microtime(true);
 
             if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
-                $expandedQuery = 
+                $expandedQuery =
                     $this->doctrineApi->getExpandedQuery(
                         $sql,
                         $params,
@@ -273,7 +269,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             $endtime = microtime(true);
 
             if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
-                $expandedQuery = 
+                $expandedQuery =
                     $this->doctrineApi->getExpandedQuery(
                         $sql,
                         $params,
@@ -297,11 +293,11 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 throw $throwException;
             }
         }
-    
+
         return $affectedRows;
     }
 
-    
+
     /**
      * Executes an SQL statement with the given parameters and returns the number of affected rows.
      *
@@ -330,14 +326,14 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $errorMessage = '';
         $affectedRows = '';
         $throwException = null;
-    
+
         $type = '';
         foreach ($this->typeArray as $type) {
             if (str_starts_with($sql, (string) $type)) {
                 break;
             }
         }
-            
+
         try {
             $affectedRows = parent::executeStatement($sql, $params, $types);
         }
@@ -352,7 +348,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
             if (
                 $this->bDisplayOutput($errorMessage, $starttime, $endtime)
             ) {
-                $expandedSql = 
+                $expandedSql =
                     $this->doctrineApi->getExpandedQuery(
                         $sql,
                         $params,
@@ -369,7 +365,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 throw $throwException;
             }
         }
-    
+
         return $affectedRows;
     }
 
@@ -410,7 +406,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                 $sql = 'exec Test- Query';
                 $this->myDebug($myName, $errorMessage, 'SQL', $table, $sql, $result, '', $endtime - $starttime);
             }
-        
+
             if ($this->debugOutput) {
                 $this->debug($myName, $errorCode, $errorMessage, $statement);
             }
@@ -459,7 +455,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     public function debug($func, $errorCode = 0, $errorMessage = '', $query = ''): void
     {
         if ($errorCode > 0) {
-            $errorDebug = 
+            $errorDebug =
                 [
                     'caller' => DatabaseConnection::class . '::' . $func,
                     'ERROR' => $errorCode . ':' . $errorMessage,
@@ -472,7 +468,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     $errorDebug,
                     $func,
                     isset($GLOBALS['error']) &&
-                    is_object($GLOBALS['error']) && 
+                    is_object($GLOBALS['error']) &&
                     @is_callable([$GLOBALS['error'], 'debug'])
                         ? ''
                         : 'DB Error'
