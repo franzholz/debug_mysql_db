@@ -5,17 +5,17 @@ TYPO3 extension debug_mysql_db
 What is does
 ------------
 
-    • It transforms SQL error messages into debug messages or any function of your choice. This helps you to get rid of the output of SQL error messagein the Frontend or Backend.
-    • It calculates the time for the performance of a SQL query.
-    • You can filter to see only buggy SQL queries.
-    • You can filter to see only SQL queries which take a long time.
+ • It transforms SQL error messages into debug messages or any function of your choice. This helps you to get rid of the output of SQL error messagein the Frontend or Backend.
+ • It calculates the time for the performance of a SQL query.
+ • You can filter to see only buggy SQL queries.
+ • You can filter to see only SQL queries which take a long time.
 
 Requirements
 ------------
 
-    • 1.5.1 and later require PHP 8 and TYPO3 12.x
-    • 1.5.0 works for TYPO3 11
-    • 1.2.1 works for TYPO3 10
+ • 1.5.1 and later require PHP 8 and TYPO3 12.x
+ • 1.5.0 works for TYPO3 11
+ • 1.2.1 works for TYPO3 10
 
 Users manual
 ------------
