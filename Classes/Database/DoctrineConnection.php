@@ -74,13 +74,11 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @throws \Doctrine\DBAL\DBALException
      */
     public function __construct(
-        #[SensitiveParameter]
         array $params,
         Driver $driver,
         ?Configuration $config = null,
         ?EventManager $eventManager = null
-    )
-    {
+    ) {
         parent::__construct($params, $driver, $config, $eventManager);
         $extensionConfiguration =
             GeneralUtility::makeInstance(
@@ -183,11 +181,11 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @throws Exception
      */
     public function executeQuery(
-        string $sql,
+        $sql,
         array $params = [],
         $types = [],
         ?QueryCacheProfile $qcp = null
-    ): Result
+    )
     {
         $starttime = microtime(true);
         $stmt = null;
@@ -248,7 +246,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws Exception
      */
-    public function executeUpdate(string $sql, array $params = [], array $types = []): int
+    public function executeUpdate($sql, array $params = [], array $types = [])
     {
         $myName = 'executeUpdate';
         $starttime = microtime(true);
@@ -380,7 +378,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws Exception
      */
-    public function exec(string $statement): int
+    public function exec($sql)
     {
         $myName = 'exec';
         $errorCode = 0;
@@ -452,7 +450,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      * @param string $func Function calling debug()
      * @param string $query Last query if not last built query
      */
-    public function debug($func, $errorCode = 0, $errorMessage = '', $query = ''): void
+    public function debug($func, $errorCode = 0, $errorMessage = '', $query = '')
     {
         if ($errorCode > 0) {
             $errorDebug =
@@ -496,7 +494,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     * @param	string		consumed time in microseconds
     * @return	void
     */
-    public function myDebug($func, $errorMessage, $mode, $table, $query, $resultSet, $affectedRows, $microseconds): void
+    public function myDebug($func, $errorMessage, $mode, $table, $query, $resultSet, $affectedRows, $microseconds)
     {
         $insertId = '';
         if (
