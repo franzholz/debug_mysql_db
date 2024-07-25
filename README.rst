@@ -13,7 +13,8 @@ What is does
 Requirements
 ------------
 
-• 1.8.0 and later require PHP 8 and TYPO3 12.x
+• 1.9.0 and later require PHP 8 and TYPO3 13.x
+• 1.8.0 works for TYPO3 12
 • 1.5.0 works for TYPO3 11
 • 1.2.1 works for TYPO3 10
 
