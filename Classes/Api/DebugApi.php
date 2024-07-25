@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 use Geithware\DebugMysqlDb\Database\DatabaseConnection;
 use Geithware\DebugMysqlDb\Database\DoctrineConnection;
@@ -157,7 +158,7 @@ class DebugApi implements SingletonInterface {
         }
         return $trail;
     }
-     
+
     /**
     * Debug function: Outputs error if any
     *
@@ -182,7 +183,8 @@ class DebugApi implements SingletonInterface {
 
         if (
             isset($GLOBALS['TSFE']) &&
-            is_object($GLOBALS['TSFE'])
+            is_object($GLOBALS['TSFE']) &&
+            $GLOBALS['TSFE'] instanceof TypoScriptFrontendController
         ) {
             if (!isset($GLOBALS['TSFE']->id)) {
                 $GLOBALS['TSFE']->determineId($this->getRequest());
@@ -299,7 +301,7 @@ class DebugApi implements SingletonInterface {
     }
 
     public function callDebugger ($debugFunc, $debugOut, $error = false): void
-    {        
+    {
         try {
             if (
                 $debugFunc == 'debug' &&
@@ -311,7 +313,7 @@ class DebugApi implements SingletonInterface {
                     $GLOBALS['error']->debug($error, 'DebugApi::callDebugger $error');
                 }
                 $GLOBALS['error']->debug(
-                    $debugOut, 
+                    $debugOut,
                     'SQL debug' . ($error ? '*ERROR*' : ''),
                     ($error ? 'F' : null)
                 );
@@ -325,7 +327,7 @@ class DebugApi implements SingletonInterface {
             DebugUtility::debug($debugOut);
         }
     }
-    
+
     /**
     * getEnableDisable function: determines if a table is enabled or disabled
     *
@@ -386,7 +388,7 @@ class DebugApi implements SingletonInterface {
                         isset($GLOBALS['TCA'][$lowerTable]) &&
                         (
                             $this->dbgTca ||
-                            $this->dbgTable['all'] 
+                            $this->dbgTable['all']
                         )
                     ) ||
                     (
@@ -427,7 +429,7 @@ class DebugApi implements SingletonInterface {
 
         return $result;
     }
-    
+
     private function getRequest(): ServerRequestInterface
     {
         return $GLOBALS['TYPO3_REQUEST'];
