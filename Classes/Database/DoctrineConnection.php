@@ -22,7 +22,6 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use Geithware\DebugMysqlDb\Api\DebugApi;
 use Geithware\DebugMysqlDb\Api\DoctrineApi;
 use Geithware\DebugMysqlDb\Database\Logging\SqlQueryLogger;
-use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 
 use Doctrine\Common\EventManager;
@@ -457,7 +456,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if ($errorCode > 0) {
             $errorDebug =
                 [
-                    'caller' => DatabaseConnection::class . '::' . $func,
+                    'caller' => DoctrineConnection::class . '::' . $func,
                     'ERROR' => $errorCode . ':' . $errorMessage,
                     'lastBuiltQuery' => $query,
                     'debug_backtrace' => DebugUtility::debugTrail()
