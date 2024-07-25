@@ -1,6 +1,7 @@
 <?php
 
 use Geithware\DebugMysqlDb\Middleware\Bootstrap;
+
 return [
     'backend' => [
         'geithware/debug-mysql-db/preprocessing' => [

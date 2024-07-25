@@ -15,7 +15,7 @@ namespace Geithware\DebugMysqlDb\Api;
  * The TYPO3 project - inspiring people to share!
  */
 use TYPO3\CMS\Core\SingletonInterface;
-use Doctrine\DBAL\Connection;
+use TYPO3\CMS\Core\Database\Connection;
 
 
 
@@ -24,10 +24,10 @@ class DoctrineApi implements SingletonInterface {
     // mit QueryBuilder Methode ergänzen
     public function getExpandedQuery ($query, $params, $types)
     {
-        $questionmarkMode = 
-            strpos((string) $query, '(?') || 
+        $questionmarkMode =
+            strpos((string) $query, '(?') ||
             strpos((string) $query, '= ?');
-        $parts = []; 
+        $parts = [];
         $partsIndex = 0;
         if ($questionmarkMode) {
             $parts = explode('?', (string) $query);
@@ -41,11 +41,11 @@ class DoctrineApi implements SingletonInterface {
             ) {
                 $type = $types[$paramName];
             } else if (is_int($value)) {
-                $type = \TYPO3\CMS\Core\Database\Connection::PARAM_INT;
+                $type = Connection::PARAM_INT;
             } else if (is_string($value)) {
-                $type = \TYPO3\CMS\Core\Database\Connection::PARAM_STR;
+                $type = Connection::PARAM_STR;
             } else {
-                $type = \TYPO3\CMS\Core\Database\Connection::PARAM_STR_ARRAY;
+                $type = Connection::PARAM_STR_ARRAY;
             }
 
             switch ($type) {
@@ -67,10 +67,10 @@ class DoctrineApi implements SingletonInterface {
                         continue 2;
                     }
                     break;
-                case \TYPO3\CMS\Core\Database\Connection::PARAM_INT:
+                case Connection::PARAM_INT:
                     $value = intval($value);
                     break;
-                case \TYPO3\CMS\Core\Database\Connection::PARAM_STR:
+                case Connection::PARAM_STR:
                     if (is_array($value)) {
                         $value = current($value);
                     }
