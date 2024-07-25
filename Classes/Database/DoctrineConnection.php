@@ -99,20 +99,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
     }
 
-    /**
-    * dependency injection of a sql logger
-    *
-    * @return bool
-    */
-    protected function connect(): ConnectionInterface
-    {
-        // Early return if the connection is already open and custom setup has been done.
-        if (!parent::connect()) {
-            return false;
-        }
-        return true;
-    }
-
     public function determineTablename($expandedQuery, $type)
     {
         $result = 'table not found';
