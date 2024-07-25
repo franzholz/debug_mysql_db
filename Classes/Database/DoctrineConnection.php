@@ -110,13 +110,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         if (!parent::connect()) {
             return false;
         }
-        $logger =
-            GeneralUtility::makeInstance(
-                SqlQueryLogger::class,
-                $this->fileWriterMode,
-                $this->backTrace
-            );
-        $configuration = $this->getConfiguration()->setSQLLogger($logger);
         return true;
     }
 
@@ -320,7 +313,7 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
      *
      * @throws Exception
      */
-    public function executeStatement($sql, array $params = [], array $types = [])
+    public function executeStatement(string $sql, array $params = [], array $types = []): int|string
     {
         $myName = 'executeStatement';
         $starttime = microtime(true);
