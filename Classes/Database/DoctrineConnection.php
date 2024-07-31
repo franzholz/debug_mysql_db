@@ -23,7 +23,6 @@ use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
-use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\SQLParserUtils;
@@ -351,7 +350,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
     }
 
 
-
     /**
      * Executes an SQL statement and return the number of affected rows.
      *
@@ -489,7 +487,12 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         }
 
         if ($mode == 'INSERT' || $mode == 'SQL') {
-            $insertId = $this->lastInsertId($table);
+            try {
+                $insertId = $this->lastInsertId();
+            }
+            catch (Exception $e) {
+                $insertId = 0;
+            }
         }
 
         $this->debugApi->myDebug($this, $func, $errorMessage, $mode, $table, $query, $affectedRows, $insertId, $microseconds);

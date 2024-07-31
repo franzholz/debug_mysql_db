@@ -1,3 +1,7 @@
+2024-07-31 Franz Holzinger  <franz@ttproducts.de>
+	* TYPO3 13
+	* INSERT and SQL mode: lastInsertId must not raise an exception if it is 0
+
 2024-02-16 Franz Holzinger  <franz@ttproducts.de>
     * use the global request object $GLOBALS['TYPO3_REQUEST']
 
@@ -107,7 +111,7 @@
 
     * bugfix: the initialization must be done in the method initialize and not in the constructor __construct.
 
-################################################################    
+################################################################
 
 26-08-19 Franz Holzinger <franz@ttproducts.de>
     * adaptions according to the coding guidelines
@@ -116,7 +120,7 @@
     * support for TYPO3 9.5 in combination with the extension typo3db_legacy.
 
 24-01-19 Franz Holzinger <franz@ttproducts.de>
-    * bugfix error message: Invalid database result detected: function TYPO3\CMS\Core\Database\DatabaseConnection->sql_free_result 
+    * bugfix error message: Invalid database result detected: function TYPO3\CMS\Core\Database\DatabaseConnection->sql_free_result
 
 18-01-19 Franz Holzinger <franz@ttproducts.de>
     * do not debug direct SQL queries about the SESSION
