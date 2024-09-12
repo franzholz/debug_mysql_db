@@ -94,7 +94,11 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         $this->fileWriterMode = $extensionConfiguration['FILEWRITER'] ? intval($extensionConfiguration['FILEWRITER']) : 0;
         $this->backTrace = (bool) $extensionConfiguration['BTRACE_SQL'];
 
-        $this->debugApi = GeneralUtility::makeInstance(DebugApi::class,  $extensionConfiguration);
+        $this->debugApi =
+            GeneralUtility::makeInstance(
+                DebugApi::class
+            );
+        $this->debugApi->init($extensionConfiguration);
         $this->doctrineApi = GeneralUtility::makeInstance(DoctrineApi::class);
     }
 
@@ -196,7 +200,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
                     );
                 $myName = 'executeQuery';
                 $table = $this->determineTablename($expandedQuery, 'SELECT');
-
                 $affectedRows = '';
                 $microseconds = $endtime - $starttime;
                 $this->myDebug($myName, $errorMessage, 'SELECT', $table, $expandedQuery, $stmt, $affectedRows, $microseconds);

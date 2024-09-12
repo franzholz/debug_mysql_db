@@ -15,13 +15,12 @@ namespace Geithware\DebugMysqlDb\Database;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use Geithware\DebugMysqlDb\Api\DebugApi;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-
+use Geithware\DebugMysqlDb\Api\DebugApi;
 
 /**
 * extension of TYPO3 mysql database debug
@@ -54,15 +53,15 @@ class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection imp
         $extensionConfiguration =
             GeneralUtility::makeInstance(
                 ExtensionConfiguration::class
-            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here 
+            )->get('debug_mysql_db'); // unserializing the configuration so we can use it here
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 
         $this->debugApi =
             GeneralUtility::makeInstance(
-                DebugApi::class,
-                $extensionConfiguration
+                DebugApi::class
             );
+        $this->debugApi->init($extensionConfiguration);
     }
 
     /**

@@ -59,10 +59,11 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
         $this->debugOutput = (intval($extensionConfiguration['DISABLE_ERRORS'])) ? false : true;
         $this->ticker = $extensionConfiguration['TICKER'] ? floatval($extensionConfiguration['TICKER']) / 1000 : '';
 
-        $this->debugApi = GeneralUtility::makeInstance(
-            DebugApi::class,
-            $extensionConfiguration
-        );
+        $this->debugApi =
+            GeneralUtility::makeInstance(
+                DebugApi::class
+            );
+        $this->debugApi->init($extensionConfiguration);
     }
 
     /**

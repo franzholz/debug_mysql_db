@@ -17,11 +17,12 @@ namespace Geithware\DebugMysqlDb\Api;
 
 use Psr\Http\Message\ServerRequestInterface;
 
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Frontend\Page\PageInformation;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 use Geithware\DebugMysqlDb\Database\DatabaseConnection;
 use Geithware\DebugMysqlDb\Database\DoctrineConnection;
@@ -39,6 +40,7 @@ use Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection;
 * @subpackage debug_mysql_db
 */
 class DebugApi implements SingletonInterface {
+    protected $dbgConf = [];
     protected $dbgQuery = [];
     protected $dbgExcludeTable = [];
     protected $dbgId = [];
@@ -55,8 +57,15 @@ class DebugApi implements SingletonInterface {
     protected $feUid = 0;
 
 
-    public function __construct (protected $dbgConf)
+    public function __construct (
+        private readonly Context $context,
+    ) {}
+
+    public function init (
+        array $dbgConf,
+    )
     {
+        $this->dbgConf = $dbgConf;
         $this->dbgOutput = $this->dbgConf['OUTPUT'] ?: '\\TYPO3\\CMS\\Utility\\DebugUtility::debug';
         $this->dbgTextformat = $this->dbgConf['TEXTFORMAT'] ?: false;
         $this->dbgTca = $this->dbgConf['TCA'] ?: false;
@@ -133,17 +142,8 @@ class DebugApi implements SingletonInterface {
             $this->dbgFeUser[intval($tmp[$i]) . '.'] = 1;
         }
 
-        if (
-            isset($GLOBALS['TSFE']) &&
-            is_object($GLOBALS['TSFE'])
-        ) {
+        $this->feUid = intval($this->context->getPropertyFromAspect('frontend.user', 'id', ''));
 
-            if (count($this->dbgFeUser) && is_object($GLOBALS['TSFE']->fe_user)) {
-                if (is_array($GLOBALS['TSFE']->fe_user->user)) {
-                    $this->feUid = intval($GLOBALS['TSFE']->fe_user->user['uid']);
-                }
-            }
-        }
     }
 
     public function debugTrail ($prependFileNames = false)
@@ -181,15 +181,9 @@ class DebugApi implements SingletonInterface {
             $sqlPart = $query;
         }
 
-        if (
-            isset($GLOBALS['TSFE']) &&
-            is_object($GLOBALS['TSFE']) &&
-            $GLOBALS['TSFE'] instanceof TypoScriptFrontendController
-        ) {
-            if (!isset($GLOBALS['TSFE']->id)) {
-                $GLOBALS['TSFE']->determineId($this->getRequest());
-            }
-            $this->id = $GLOBALS['TSFE']->id;
+        $pageInformation = $this->getRequest()->getAttribute('frontend.page.information');
+        if ($pageInformation instanceof PageInformation) {
+            $this->id = $pageInformation->getId();
         }
 
         $debugArray = ['function/mode'=>'Pg' . $this->id . ' ' . $func . '(' . $table . ') - ',  'SQL query' => $query];
@@ -283,7 +277,6 @@ class DebugApi implements SingletonInterface {
                 }
 
                 if ($this->dbgConf['BTRACE_SQL']) {
-
                     $debugArray['debug_backtrace'] =  $this->debugTrail();
                 }
                 $debugArray['miliseconds'] = round($microseconds * 1000, 3);

@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Geithware\DebugMysqlDb\:
+    resource: '../Classes/'
+    exclude: ['../Classes/{Log,Middleware}/']

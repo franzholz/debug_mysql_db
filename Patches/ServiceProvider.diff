@@ -1,6 +1,28 @@
---- /home/franz/Downloads/TYPO3/typo3_src-12.4.6/typo3/sysext/install/Classes/ServiceProvider.php	2023-09-12 08:54:01.000000000 +0200
-+++ TYPO3/sysext/install/Classes/ServiceProvider.php	2023-09-15 16:00:22.438795476 +0200
-@@ -293,6 +293,11 @@
+--- /home/franz/Downloads/TYPO3/typo3_src-13.2.1-debug/typo3/sysext/install/Classes/ServiceProvider.php	2024-07-02 09:22:06.000000000 +0200
++++ TYPO3/sysext/install/Classes/ServiceProvider.php	2024-09-10 21:33:58.275311239 +0200
+@@ -263,6 +263,10 @@
+ 
+     public static function getMaintenanceMiddleware(ContainerInterface $container): Middleware\Maintenance
+     {
++        // FHO Anfang
++        $lateBootService = $container->get(Service\LateBootService::class);
++        $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
++        // FHO Ende
+         return new Middleware\Maintenance(
+             $container->get(FailsafePackageManager::class),
+             $container->get(ConfigurationManager::class),
+@@ -275,6 +279,10 @@
+ 
+     public static function getEnvironmentController(ContainerInterface $container): Controller\EnvironmentController
+     {
++        // FHO Anfang
++        $lateBootService = $container->get(Service\LateBootService::class);
++        $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
++        // FHO Ende
+         return new Controller\EnvironmentController(
+             $container->get(Service\LateBootService::class),
+             $container->get(FormProtectionFactory::class),
+@@ -327,6 +335,11 @@
  
      public static function getMaintenanceController(ContainerInterface $container): Controller\MaintenanceController
      {
@@ -12,11 +34,11 @@
          return new Controller\MaintenanceController(
              $container->get(Service\LateBootService::class),
              $container->get(Service\ClearCacheService::class),
-@@ -306,6 +311,11 @@
+@@ -342,6 +355,11 @@
  
      public static function getSettingsController(ContainerInterface $container): Controller\SettingsController
      {
-+         // FHO Anfang
++        // FHO Anfang
 +        $lateBootService = $container->get(Service\LateBootService::class);
 +        $container = $lateBootService->loadExtLocalconfDatabaseAndExtTables();
 +        // FHO Ende
