@@ -6,7 +6,7 @@ return [
     'backend' => [
         'geithware/debug-mysql-db/preprocessing' => [
             'target' => Bootstrap::class,
-            'description' => 'The global error object ($GLOBALS[\'TYPO3_DB\']) or the ConnectionPool wrapperClass must be set and initialized.',
+            'description' => 'The global database object ($GLOBALS[\'TYPO3_DB\']) or the ConnectionPool wrapperClass must be set and initialized.',
             'before' => [
                 'typo3/cms-backend/locked-backend'
             ],
@@ -15,7 +15,7 @@ return [
     'frontend' => [
         'geithware/debug-mysql-db/preprocessing' => [
             'target' => Bootstrap::class,
-            'description' => 'The global error object ($GLOBALS[\'error\']) must be set and initialized.',
+            'description' => 'The global database object ($GLOBALS[\'TYPO3_DB\']) or the ConnectionPool wrapperClass must be set and initialized.',
             'before' => [
                 'typo3/cms-frontend/maintenance-mode'
             ],
