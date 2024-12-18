@@ -233,69 +233,6 @@ class DoctrineConnection extends \TYPO3\CMS\Core\Database\Connection implements 
         return $stmt;
     }
 
-    /**
-     * Executes an SQL INSERT/UPDATE/DELETE query with the given parameters
-     * and returns the number of affected rows.
-     *
-     * This method supports PDO binding types as well as DBAL mapping types.
-     *
-     * @param string         $query  The SQL query.
-     * @param mixed[]        $params The query parameters.
-     * @param int[]|string[] $types  The parameter types.
-     *
-     * @return int The number of affected rows.
-     *
-     * @throws Exception
-     */
-    public function executeUpdate(string $sql, array $params = [], array $types = []): int
-    {
-        $myName = 'executeUpdate';
-        $starttime = microtime(true);
-        $errorCode = 0;
-        $errorMessage = '';
-        $affectedRows = '';
-        $throwException = null;
-
-        try {
-            $affectedRows = parent::executeUpdate($sql, $params, $types);
-        }
-        catch (Throwable $e) {
-            $errorCode = $e->getCode();
-            $errorMessage = $e->getMessage();
-            $throwException = $e;
-        }
-        finally {
-            $endtime = microtime(true);
-
-            if ($this->bDisplayOutput($errorMessage, $starttime, $endtime)) {
-                $expandedQuery =
-                    $this->doctrineApi->getExpandedQuery(
-                        $sql,
-                        $params,
-                        $types
-                    );
-
-                $type = '';
-                foreach ($this->typeArray as $type) {
-                    if (str_starts_with($sql, (string) $type)) {
-                        break;
-                    }
-                }
-                $table = $this->determineTablename($expandedQuery, $type);
-                $this->myDebug($myName, $errorMessage, $type, $table, $expandedQuery, null, $affectedRows, $endtime - $starttime);
-            }
-            if ($this->debugOutput) {
-                $this->debug($myName, $errorCode, $errorMessage, $sql);
-            }
-
-            if (is_object($throwException)) {
-                throw $throwException;
-            }
-        }
-
-        return $affectedRows;
-    }
-
 
     /**
      * Executes an SQL statement with the given parameters and returns the number of affected rows.
