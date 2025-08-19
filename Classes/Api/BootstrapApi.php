@@ -111,7 +111,7 @@ class BootstrapApi
             }
             
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['initCommands'])) {
-                $commandsAfterConnect = TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+                $commandsAfterConnect = GeneralUtility::trimExplode(
                     LF,
                     str_replace(
                         '\' . LF . \'',
