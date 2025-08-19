@@ -43,7 +43,7 @@ class BootstrapApi
     {
         $extensionKey = 'debug_mysql_db';
         if (!isset($GLOBALS['TYPO3_REQUEST'])) {
-                $GLOBALS['TYPO3_REQUEST'] = $request;
+            $GLOBALS['TYPO3_REQUEST'] = $request;
         }
 
         $extensionConfiguration = GeneralUtility::makeInstance(
@@ -65,10 +65,10 @@ class BootstrapApi
 
             require_once(ExtensionManagementUtility::extPath($extensionKey) . 'Classes/Api/DebugApi.php');
             require_once(ExtensionManagementUtility::extPath($extensionKey) . 'Classes/Database/Typo3DbLegacyConnection.php');
-            
+
             // Initialize database connection in $GLOBALS and connect
             $databaseConnection = GeneralUtility::makeInstance(Typo3DbLegacyConnection::class);
-            
+
             $databaseConnection->setDatabaseName(
                 $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['dbname'] ?? ''
             );
@@ -78,7 +78,7 @@ class BootstrapApi
             $databaseConnection->setDatabasePassword(
                 $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['password'] ?? ''
             );
-            
+
             $databaseHost = $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['host'] ?? '';
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['port'])) {
                 $databaseConnection->setDatabasePort($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['port']);
@@ -87,7 +87,7 @@ class BootstrapApi
                 [$databaseHost, $databasePort] = explode(':', (string) $databaseHost);
                 $databaseConnection->setDatabasePort($databasePort);
             }
-            
+
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['unix_socket'])) {
                 $databaseConnection->setDatabaseSocket(
                     $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['unix_socket']
@@ -95,13 +95,13 @@ class BootstrapApi
             }
             $databaseConnection->setDatabaseHost($databaseHost);
             $databaseConnection->debugOutput = $GLOBALS['TYPO3_CONF_VARS']['SYS']['sqlDebug'] ?? false;
-            
+
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['persistentConnection'])
                 && $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['persistentConnection']
             ) {
                 $databaseConnection->setPersistentDatabaseConnection(true);
             }
-            
+
             $isDatabaseHostLocalHost = in_array($databaseHost, ['localhost', '127.0.0.1', '::1'], true);
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['driverOptions'])
                 && $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['driverOptions'] & MYSQLI_CLIENT_COMPRESS
@@ -109,9 +109,9 @@ class BootstrapApi
             ) {
                 $databaseConnection->setConnectionCompression(true);
             }
-            
+
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['initCommands'])) {
-                $commandsAfterConnect = TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(
+                $commandsAfterConnect = GeneralUtility::trimExplode(
                     LF,
                     str_replace(
                         '\' . LF . \'',
@@ -126,13 +126,13 @@ class BootstrapApi
             $GLOBALS['TYPO3_DB'] = $databaseConnection;
             $GLOBALS['TYPO3_DB']->initialize();
         }
-        
+
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Database\Connection::class] = [
             'className' => \Geithware\DebugMysqlDb\Database\DoctrineConnection::class
         ];
-        
+
         $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][\TYPO3\CMS\Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME]['wrapperClass'] = \Geithware\DebugMysqlDb\Database\DoctrineConnection::class;
-        
+
         if ($extensionConfiguration['FILEWRITER']) {
             $GLOBALS['TYPO3_CONF_VARS']['LOG']['Geithware']['DebugMysqlDb'] = [
                 'writerConfiguration' => [
