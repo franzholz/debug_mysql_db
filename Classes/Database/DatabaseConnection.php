@@ -32,8 +32,6 @@ use Geithware\DebugMysqlDb\Api\DebugApi;
 * @subpackage debug_mysql_db
 */
 class DatabaseConnection extends \TYPO3\CMS\Core\Database\DatabaseConnection implements SingletonInterface {
-
-
     protected $debugApi = null;
     public $debugOutput = false;
     protected $ticker = '';

@@ -6,4 +6,4 @@ services:
 
   Geithware\DebugMysqlDb\:
     resource: '../Classes/'
-    exclude: ['../Classes/{Log,Middleware}/']
+    exclude: ['../Classes/{Log,Middleware}/','../Classes/Database/Legacy/']
