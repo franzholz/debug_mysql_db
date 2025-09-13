@@ -1,3 +1,7 @@
+
+2025-09-13 Franz Holzinger  <franz@ttproducts.de>
+	* Breaking no. 80929: TYPO3_DB with class DatabaseConnection moved to extension typo3db_legacy
+
 2024-12-18 Franz Holzinger  <franz@ttproducts.de>
     * remove method executeUpdate, because it has been renamed into executeStatement
 
