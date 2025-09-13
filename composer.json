@@ -23,12 +23,12 @@
     "GPL-2.0-or-later"
   ],
   "require": {
-    "php": "^8.1",
+    "php": "^8.2",
     "typo3/cms-core": "^13"
   },
   "suggest": {
     "friendsoftypo3/typo3db-legacy": "^1.2",
-    "jambagecom/fh-debug": "^0.17"
+    "jambagecom/fh-debug": "^0.18"
   },
   "autoload": {
     "psr-4": {
