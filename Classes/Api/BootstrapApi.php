@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 
-use Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection;
+use Geithware\DebugMysqlDb\Database\Legacy\Typo3DbLegacyConnection;
 use Geithware\DebugMysqlDb\Log\Writer\FileWriter;
 
 
@@ -64,7 +64,7 @@ class BootstrapApi
             //**********************************************
 
             require_once(ExtensionManagementUtility::extPath($extensionKey) . 'Classes/Api/DebugApi.php');
-            require_once(ExtensionManagementUtility::extPath($extensionKey) . 'Classes/Database/Typo3DbLegacyConnection.php');
+            require_once(ExtensionManagementUtility::extPath($extensionKey) . 'Classes/Database/Legacy/Typo3DbLegacyConnection.php');
 
             // Initialize database connection in $GLOBALS and connect
             $databaseConnection = GeneralUtility::makeInstance(Typo3DbLegacyConnection::class);

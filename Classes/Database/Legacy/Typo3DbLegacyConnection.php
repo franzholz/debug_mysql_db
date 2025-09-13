@@ -1,6 +1,6 @@
 <?php
 
-namespace Geithware\DebugMysqlDb\Database;
+namespace Geithware\DebugMysqlDb\Database\Legacy;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -17,12 +17,14 @@ namespace Geithware\DebugMysqlDb\Database;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use Geithware\DebugMysqlDb\Api\DebugApi;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\DebugUtility;
+
+use TYPO3\CMS\Typo3DbLegacy\Database\DatabaseConnection;
+
+use Geithware\DebugMysqlDb\Api\DebugApi;
 
 
 /**

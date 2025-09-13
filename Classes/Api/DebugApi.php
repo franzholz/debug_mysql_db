@@ -26,7 +26,7 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 
 use Geithware\DebugMysqlDb\Database\DatabaseConnection;
 use Geithware\DebugMysqlDb\Database\DoctrineConnection;
-use Geithware\DebugMysqlDb\Database\Typo3DbLegacyConnection;
+use Geithware\DebugMysqlDb\Database\Legacy\Typo3DbLegacyConnection;
 
 
 
