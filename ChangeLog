@@ -1,3 +1,5 @@
+2025-10-04 Franz Holzinger  <franz@ttproducts.de>
+    * fix backtrace
 
 2025-09-13 Franz Holzinger  <franz@ttproducts.de>
 	* Breaking no. 80929: TYPO3_DB with class DatabaseConnection moved to extension typo3db_legacy
