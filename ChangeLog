@@ -1,3 +1,6 @@
+2025-10-04 Franz Holzinger  <franz@ttproducts.de>
+    * fix backtrace
+
 2024-12-18 Franz Holzinger  <franz@ttproducts.de>
     * remove method executeUpdate, because it has been renamed into executeStatement
 

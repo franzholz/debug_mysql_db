@@ -151,10 +151,14 @@ class DebugApi implements SingletonInterface {
         $trail = DebugUtility::debugTrail($prependFileNames);
 
         if (!empty($this->dbgConf['BTRACE_LIMIT'])) {
-            $search = '// Geithware';
+            $search = '// Geithware\DebugMysqlDb\Database';
             $position = strpos($trail, $search);
-            $trail = substr($trail, 0, $position - 1);
-            $trail = substr($trail, -$this->dbgConf['BTRACE_LIMIT']);
+            if ($position) {
+                $trail = substr($trail, 0, $position - 1);
+                $trail = substr($trail, -$this->dbgConf['BTRACE_LIMIT']);
+            } else {
+                $trail = 'ERROR';
+            }
         }
         return $trail;
     }
