@@ -358,11 +358,11 @@ class DebugApi implements SingletonInterface {
 
         if (strlen($tablePart) > 1) {
             $partArray = explode('.', $tablePart);
-            $lowerTable = strtolower($partArray['0']);
+            $lowerTable = strtolower($partArray[0]);
             $aliasArray = explode(' ', $lowerTable);
-            $lowerTable = $aliasArray['0'];
+            $lowerTable = $aliasArray[0];
             if ($lowerTable == '') {
-                $lowerTable = $aliasArray['1'];
+                $lowerTable = $aliasArray[1];
             }
             $lowerTable = trim($lowerTable);
             $keyWords = ['select', 'transaction', 'commit', 'update', 'delete', 'from', 'where', 'order', 'by', 'sorting', 'desc', 'insert', 'into', 'set', 'group', 'and', 'or'];
