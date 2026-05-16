@@ -554,10 +554,10 @@ class Typo3DbLegacyConnection extends DatabaseConnection implements SingletonInt
                 if (
                     isset($rowArray) &&
                     is_array($rowArray) &&
-                    isset($rowArray['0']) &&
-                    is_array($rowArray['0'])
+                    isset($rowArray[0]) &&
+                    is_array($rowArray[0])
                 ) {
-                    $result = $rowArray['0']['uid'];
+                    $result = $rowArray[0]['uid'];
                 }
             }
         }
