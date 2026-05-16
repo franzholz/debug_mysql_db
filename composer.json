@@ -24,7 +24,7 @@
   ],
   "require": {
     "php": "^8.2",
-    "typo3/cms-core": "^13"
+    "typo3/cms-core": "^13 || ^14 "
   },
   "suggest": {
     "friendsoftypo3/typo3db-legacy": "^1.2",
@@ -40,7 +40,11 @@
   },
   "extra": {
     "typo3/cms": {
-      "extension-key": "debug_mysql_db"
+      "extension-key": "debug_mysql_db",
+        "version": "1.9.5",
+        "Package": {
+            "providesPackages": {}
+        }
     }
   }
 }
