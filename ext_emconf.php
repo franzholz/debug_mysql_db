@@ -2,7 +2,7 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Debug Mysql or other DB',
-    'description' => 'Extends \\TYPO3\\CMS\\Core\\Database\\Connection and \\TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection to show Errors and Debug-Messages. Debugging of sql-queries by debug and FileWriter.',
+    'description' => 'Extends \\TYPO3\\CMS\\Core\\Database\\Connection and \\TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection to show errors and debug messages. Debugging of sql-queries by debug and FileWriter.',
     'category' => 'misc',
     'version' => '1.9.6',
     'state' => 'stable',

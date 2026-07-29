@@ -1,7 +1,7 @@
 {
   "name": "geithware/debug-mysql-db",
   "type": "typo3-cms-extension",
-  "description": "Extends \\TYPO3\\CMS\\Typo3DbLegacy\\Database (former \\TYPO3\\CMS\\Core\\Database\\DatabaseConnection and t3lib_db) to show Errors and Debug-Messages. Useful for viewing and debugging of sql-queries.",
+  "description": "Debug Mysql or other DB - Extends \\TYPO3\\CMS\\Core\\Database\\Connection and \\TYPO3\\CMS\\Typo3DbLegacy\\Database\\DatabaseConnection to show errors and debug messages. Debugging of SQL queries by debug and FileWriter. Useful for viewing and debugging of SQL queries.",
   "keywords": [
     "TYPO3",
     "debug",
