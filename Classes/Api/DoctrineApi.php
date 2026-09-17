@@ -79,7 +79,7 @@ class DoctrineApi implements SingletonInterface {
             }
 
             if ($questionmarkMode) {
-                $parts[$partsIndex++] .= $value;
+                $parts[$partsIndex++] = $value;
             } else {
                 $expandedQuery = str_replace(':' . $paramName, $value, (string) $expandedQuery);
             }

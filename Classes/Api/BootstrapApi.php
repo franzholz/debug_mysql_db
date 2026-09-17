@@ -94,7 +94,7 @@ class BootstrapApi
                 );
             }
             $databaseConnection->setDatabaseHost($databaseHost);
-            $databaseConnection->debugOutput = $GLOBALS['TYPO3_CONF_VARS']['SYS']['sqlDebug'] ?? false;
+            $databaseConnection->debugOutput = (bool)($GLOBALS['TYPO3_CONF_VARS']['SYS']['sqlDebug'] ?? false);
 
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['persistentConnection'])
                 && $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default']['persistentConnection']
